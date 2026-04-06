@@ -83,7 +83,7 @@ Make sure the following tools are installed:
 
 Create a `.env` file in your project root and paste the following:
 
-```env
+
 # 🔐 Backend Services
 FIREBASE_API_KEY=your_firebase_api_key
 ALIBABA_ENDPOINT=your_alibaba_endpoint
