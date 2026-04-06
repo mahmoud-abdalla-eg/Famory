@@ -1,4 +1,4 @@
-# 🏠 FamilyHub AI
+# 🏠 One Famory
 
 FamilyHub AI is a smart family coordination platform designed to bring families closer together—no matter what language they speak. It replaces scattered WeChat groups, forgotten photo albums, and sticky-note chaos with one simple, private space where families can organize, share, and remember.
 
