@@ -41,14 +41,10 @@ Don't want to install another app? Join your family hub right inside WeChat with
 | 🎨 Design | Figma, Material Design 3, Noto Sans Arabic/CJK fonts |
 
 📁 Project Structure
-familyhub-ai/
+onefamory/
 ├─ mobile/            # Flutter app: i18n, AI, RTL layouts
-├─ miniprogram/       # WeChat Mini-Program: read-only sync
 ├─ website/           # Vite React showcase site + language
 ├─ backend/           # Backend Logic And routing
-├─ ai/                # clustering logic
-├─ docs/              # Proposal, pitch deck, consent forms
-├─ .env.example       # Environment variable template
 └─ README.md          # You are here
 
 ---
@@ -64,32 +60,7 @@ Make sure the following tools are installed:
 | Flutter SDK | 3.x or later | Mobile app development |
 | Node.js | v16+ | Website backend and build tools |
 | npm or yarn | Latest | Package management |
-| Firebase CLI | Latest | Backend deployment (optional) |
 | Git | Latest | Version control |
-
----
-
-### ⚙️ Mobile App Setup (Flutter)
-
-| Step | Command | Description |
-|------|---------|-------------|
-| 1 | `git clone https://github.com/your-username/familyhub-ai.git` | Clone the repository |
-| 2 | `cd familyhub-ai/mobile` | Navigate to mobile folder |
-| 3 | `flutter pub get` | Install Flutter dependencies |
-| 4 | Create `.env` file | Add your Firebase or Alibaba credentials |
-| 5 | `flutter run` | Launch the app on emulator or device |
-
-### 🔑 Environment Variables (`.env`)
-
-Create a `.env` file in your project root and paste the following:
-
-
-# 🔐 Backend Services
-FIREBASE_API_KEY=your_firebase_api_key
-ALIBABA_ENDPOINT=your_alibaba_endpoint
-
-# 🌍 App Configuration
-DEFAULT_LANGUAGE=en
 
 ---
 
@@ -97,21 +68,9 @@ DEFAULT_LANGUAGE=en
 
 | Step | Command | Description |
 |------|---------|-------------|
-| 1 | `cd ../website` | Navigate to web folder |
+| 1 | `cd ../famory website` | Navigate to web folder |
 | 2 | `npm install` | Install Node.js dependencies |
 | 3 | `npm run dev` | Start development server |
-| 4 | Open `http://localhost:3000` | View the showcase website |
-
----
-
-### 💬 WeChat Mini-Program Setup
-
-| Step | Action | Description |
-|------|--------|-------------|
-| 1 | Open WeChat DevTools | Launch the official developer tool |
-| 2 | Import Project | Select the `miniprogram/` folder |
-| 3 | Configure AppID | Add your WeChat AppID in `project.config.json` |
-| 4 | Preview | Test in simulator or scan QR code with real device |
 
 ---
 
@@ -128,21 +87,9 @@ DEFAULT_LANGUAGE=en
 
 ---
 
-## 🚧 Project Status
-
-| Phase | Status | Timeline |
-|-------|--------|----------|
-| 📋 Proposal | ✅ Complete | March 2026 |
-| 🎨 Prototype | ✅ Complete | Early April 2026 |
-| 🛠 MVP Development | 🔄 In Progress | Mid-Late April 2026 |
-| 🧪 Pilot Testing | ⏳ Upcoming | May 2026 |
-| 🏆 Competition Finals | ⏳ Upcoming | Early June 2026 |
-
----
-
 ## 💡 Vision
 
-The goal of FamilyHub AI is to make family life:
+The goal of One Famory is to make family life:
 
 | Goal | Impact |
 |------|--------|
@@ -157,23 +104,10 @@ The goal of FamilyHub AI is to make family life:
 
 | Role | Contributor | Contact |
 |------|------------|---------|
-| 💼 Project Lead | `@your-handle`
-| 📱 Mobile Developer | `@your-handle`
-| 🌐 Web Developer | `@your-handle`
-| 🌐 Mini App | `@your-handle`
+| 💼 Project Lead | `@mahmoud-abdalla-eg`
+| 📱 Mobile Developer | `@saeif-ahmed-ye / Zack/ @mahmoud-abdalla-eg`
+| 🌐 Web Developer | `@mahmoud-abdalla-eg`
 | 🎓 Faculty Advisor | `Prof. [Name]`
-
----
-
-## 🔗 Useful Links
-
-| Resource | Link |
-|----------|------|
-| 🎬 Demo Video | [Watch Here](#) |
-| 🎨 Figma Prototype | [Explore Design](#) |
-| 🌐 Showcase Website | [Visit Site](#) |
-| 📄 Full Proposal | [Read PDF](docs/proposal.md) |
-| 📋 Pilot Consent Form | [View Template](docs/consent.md) |
 
 ---
 
@@ -182,10 +116,9 @@ The goal of FamilyHub AI is to make family life:
 | Item | Details |
 |------|---------|
 | 🔐 Code License | Private & Proprietary (Competition Phase) → Public Release (Post-Competition) |
-| 🤖 AI Models | Open-weight models used under respective licenses with attribution |
 | 🎓 Current Purpose | Academic project for Jinan University "AI+" Innovation Competition 2026 |
 | 🚀 Future Plan | Open to public release after competition finals (June 2026) |
-| 📬 Inquiries | Contact the team at `familyhub-ai@jnu.edu.cn` for collaboration or early access |
+| 📬 Inquiries | Contact the team at `mahmouddesign01@gmail.com` for collaboration or early access |
 
 > ⚠️ **Notice:** During the competition phase (April–June 2026), this repository is for academic demonstration and judging purposes only. After the competition concludes, we plan to open-source core components and release the app publicly. Stay tuned for updates! 🎉
 
