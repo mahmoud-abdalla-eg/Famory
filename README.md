@@ -1,6 +1,6 @@
 # 🏠 One Famory
 
-Oner Famoru is a smart family coordination platform designed to bring families closer together—no matter what language they speak. It replaces scattered WeChat groups, forgotten photo albums, and sticky-note chaos with one simple, private space where families can organize, share, and remember.
+One Famory is a smart family coordination platform designed to bring families closer together—no matter what language they speak. It replaces scattered WeChat groups, forgotten photo albums, and sticky-note chaos with one simple, private space where families can organize, share, and remember.
 
 Think of it as your family's personal command center, but friendly, fun, and actually easy to use.
 
@@ -107,10 +107,10 @@ The goal of One Famory is to make family life:
 
 ## 👥 Team
 
-| Role | Contributor | Contact |
-|------|------------|---------|
+| Role | Contributor |
+|------|------------|
 | 💼 Project Lead | `@mahmoud-abdalla-eg`
-| 📱 Mobile Developer | `@saeif-ahmed-ye / Zack/ @mahmoud-abdalla-eg`
+| 📱 Mobile Developer | `@saeif-ahmed-ye / Zack/ @mahmoud-abdalla-eg` 
 | 🌐 Web Developer | `@mahmoud-abdalla-eg`
 | 🎓 Faculty Advisor | `Prof. [Name]`
 
