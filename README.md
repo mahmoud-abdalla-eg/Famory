@@ -1,6 +1,6 @@
 # 🏠 One Famory
 
-FamilyHub AI is a smart family coordination platform designed to bring families closer together—no matter what language they speak. It replaces scattered WeChat groups, forgotten photo albums, and sticky-note chaos with one simple, private space where families can organize, share, and remember.
+Oner Famoru is a smart family coordination platform designed to bring families closer together—no matter what language they speak. It replaces scattered WeChat groups, forgotten photo albums, and sticky-note chaos with one simple, private space where families can organize, share, and remember.
 
 Think of it as your family's personal command center, but friendly, fun, and actually easy to use.
 
@@ -41,37 +41,43 @@ Don't want to install another app? Join your family hub right inside WeChat with
 | 🎨 Design | Figma, Material Design 3, Noto Sans Arabic/CJK fonts |
 
 📁 Project Structure
-onefamory/
-├─ mobile/            # Flutter app: i18n, AI, RTL layouts
-├─ website/           # Vite React showcase site + language
-├─ backend/           # Backend Logic And routing
-└─ README.md          # You are here
+OneFamory/
+├─ mobile/ # Flutter app (iOS + Android)
+├─ website/ # Vite + React showcase site
+├─ backend/ # Node.js + Express + MongoDB
+└─ README.md # You are here
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (for The Team)
 
 ### Prerequisites
 
-Make sure the following tools are installed:
+- Flutter SDK 3.x
+- Node.js v16+
+- MongoDB Atlas account (free tier)
+- Git
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Flutter SDK | 3.x or later | Mobile app development |
-| Node.js | v16+ | Website backend and build tools |
-| npm or yarn | Latest | Package management |
-| Git | Latest | Version control |
+### Quick setup
 
----
+# Clone the repo
+git clone https://github.com/mahmoud-abdalla-eg/OneFamory.git
+cd OneFamory
 
-### 🌐 Website Setup (Next.js)
+# Backend
+cd backend
+npm install
+npm run dev
 
-| Step | Command | Description |
-|------|---------|-------------|
-| 1 | `cd ../famory website` | Navigate to web folder |
-| 2 | `npm install` | Install Node.js dependencies |
-| 3 | `npm run dev` | Start development server |
+# Mobile (Flutter)
+cd ../mobile
+flutter pub get
+flutter run
 
+# Website
+cd ../website
+npm install
+npm run dev
 ---
 
 ## 🔮 Future Improvements
