@@ -35,10 +35,9 @@ Don't want to install another app? Join your family hub right inside WeChat with
 |-------|------------|
 | 📱 Mobile App | Flutter (iOS + Android) + `intl` for i18n & RTL |
 | 💬 WeChat Mini-Program | Flutter-to-MP bridge / Native MP fallback |
-| 🌐 Showcase Website | Next.js / Vue.js + Vercel with `/en`, `/zh`, `/ar` routing |
-| 🤖 AI Core | CLIP (photo clustering), Qwen-1.8B-Chat (multilingual captions), DBSCAN |
+| 🌐 Showcase Website | Vite + React + Vercel with `/en`, `/zh`, `/ar` routing |
 | 🔧 Backend | Firebase / Alibaba Serverless (Auth, Firestore, Cloud Functions) |
-| 🎨 Design | Figma, Material Design 3, Noto Sans Arabic/CJK fonts |
+| 🎨 Design | Figma, Tailwind |
 
 📁 Project Structure
 OneFamory/
@@ -121,12 +120,10 @@ The goal of One Famory is to make family life:
 
 | Item | Details |
 |------|---------|
-| 🔐 Code License | Private & Proprietary (Competition Phase) → Public Release (Post-Competition) |
+| 🔐 Code License | Private & Proprietary (Competition Phase) |
 | 🎓 Current Purpose | Academic project for Jinan University "AI+" Innovation Competition 2026 |
 | 🚀 Future Plan | Open to public release after competition finals (June 2026) |
 | 📬 Inquiries | Contact the team at `mahmouddesign01@gmail.com` for collaboration or early access |
-
-> ⚠️ **Notice:** During the competition phase (April–June 2026), this repository is for academic demonstration and judging purposes only. After the competition concludes, we plan to open-source core components and release the app publicly. Stay tuned for updates! 🎉
 
 ---
 
