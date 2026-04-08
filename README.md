@@ -110,7 +110,7 @@ The goal of One Famory is to make family life:
 | Role | Contributor |
 |------|------------|
 | 💼 Project Lead | `@mahmoud-abdalla-eg`
-| 📱 Mobile Developer | `@saeif-ahmed-ye / Zack/ @mahmoud-abdalla-eg` 
+| 📱 Mobile Developer | `@saeif-ahmed-ye / @zack-LiuJing-Kh/ @mahmoud-abdalla-eg` 
 | 🌐 Web Developer | `@mahmoud-abdalla-eg`
 | 🎓 Faculty Advisor | `Prof. [Name]`
 
