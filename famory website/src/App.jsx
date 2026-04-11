@@ -3,7 +3,7 @@ import { translations } from "./constants/translations";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import FeaturesSection from "./components/FeaturesSection";
-import AboutUsSection from "./Components/AboutUsSection";
+import AboutUsSection from "./components/AboutUsSection";
 import FAQSection from "./components/FAQSection";
 import CTASection from "./components/CTASection";
 import Footer from "./components/Footer";
