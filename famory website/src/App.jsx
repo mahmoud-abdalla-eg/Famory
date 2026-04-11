@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { translations } from "./constants/translations";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
@@ -34,6 +35,7 @@ export default function App() {
       <FAQSection t={t} darkMode={darkMode} />
       <CTASection t={t} darkMode={darkMode} />
       <Footer t={t} darkMode={darkMode} />
+      <SpeedInsights />
     </div>
   );
 }
