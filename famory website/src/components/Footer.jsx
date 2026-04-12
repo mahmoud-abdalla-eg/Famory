@@ -1,7 +1,9 @@
 import React from "react";
-import logo from "../assets/famory-logo.png";
+import logolight from "../assets/light-famory-logo.png";
+import logodark from "../assets/dark-famory-logo.png";
 
-export default function Footer({ t, darkMode }) {
+
+export default function Footer({ t, darkMode, goContact }) {
   const sectionBg = darkMode ? "bg-[#0F172A]" : "bg-white";
   const containerBg = darkMode ? "bg-[#1E293B]" : "bg-[#EAF6FC]";
   const titleClass = darkMode ? "text-white" : "text-[#1A2332]";
@@ -18,7 +20,7 @@ export default function Footer({ t, darkMode }) {
             {/* Brand Column */}
             <div className="space-y-6">
               <div className="flex items-center gap-2.5">
-                          <img src={logo} alt="One Famory Logo" className="h-16 "/>
+                          <img src={(darkMode ? logodark : logolight)} alt="One Famory Logo" className="h-16 " darkMode={darkMode}/>
                 <span className={`text-xl font-bold tracking-tight ${titleClass}`}>One Famory</span>
               </div>
               <p className={`text-sm leading-relaxed max-w-xs ${textClass}`}>
@@ -47,7 +49,7 @@ export default function Footer({ t, darkMode }) {
                   { key: "features", href: "#features" },
                   { key: "aboutUs", href: "#aboutUs" },
                   { key: "faq", href: "#faq" },
-                  { key: "contact", href: "#home" }
+                  { key: "contact", href: {goContact} }
                 ].map((item) => (
                   <li key={item.key}>
                     <a href={item.href} className={`text-sm transition-colors ${linkClass}`}>
