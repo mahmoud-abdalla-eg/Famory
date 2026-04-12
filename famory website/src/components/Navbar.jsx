@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LanguageToggle from "./LanguageToggle";
 import ThemeToggle from "./ThemeToggle";
-import logo from "../assets/famory-logo.png";
+import logolight from "../assets/light-famory-logo.png";
+import logodark from "../assets/dark-famory-logo.png";
 
 export default function Navbar({ lang, setLang, t, darkMode, setDarkMode }) {
   const [scrolled, setScrolled] = useState(false);
@@ -31,7 +32,7 @@ export default function Navbar({ lang, setLang, t, darkMode, setDarkMode }) {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2.5">
-          <img src={logo} alt="One Famory Logo" className="h-16 "/>
+          <img src={(darkMode ? logodark : logolight)} alt="One Famory Logo" className="h-16 " darkMode={darkMode}/>
           <span className={`text-xl font-bold tracking-tight ${logoTextClass}`}>One Famory</span>
         </a>
 
@@ -53,7 +54,7 @@ export default function Navbar({ lang, setLang, t, darkMode, setDarkMode }) {
             whileTap={{ scale: 0.97 }}
             className="bg-[#3EB6EC] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#2BA5DA] transition-colors flex items-center gap-2"
           >
-            {t.contact}
+            {t.contactBtn}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
           </motion.button>
         </div>
@@ -86,7 +87,7 @@ export default function Navbar({ lang, setLang, t, darkMode, setDarkMode }) {
                 </a>
               ))}
               <button className="mt-2 bg-[#3EB6EC] text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
-                {t.contact}
+                {t.contactBtn}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </button>
             </div>

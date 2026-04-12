@@ -1,7 +1,24 @@
 export const translations = {
   en: {
-    nav: { features: "Features", aboutUs: "About", faq: "FAQ" },
-    contact: "Contact",
+    nav: { features: "Features", aboutUs: "About", faq: "FAQ", contact: "Contact" },
+    contactBtn: "Contact",
+     contact: {
+      title: "Get in Touch",
+      subtitle: "Have questions about One Famory? We'd love to hear from you. We are currently in the development phase for the Jinan University AI+ Competition 2026.",
+      form: {
+        name: "Your Name",
+        email: "Email Address",
+        subject: "Subject",
+        message: "Message",
+        send: "Send Message"
+      },
+      info: {
+        email: "contact@onefamory.com",
+        location: "Jinan University, Guangzhou, China"
+      },
+      success: "Message sent! We'll get back to you soon.",
+      backHome: "Back to Home"
+    },
     badge: "Jinan University AI+ Innovation Competition 2026 — In Development",
 
     hero: {
@@ -65,8 +82,25 @@ export const translations = {
   },
 
   ar: {
-    nav: { features: "الميزات", aboutUs: "عن التطبيق", faq: "الأسئلة الشائعة" },
-    contact: "تواصل معنا",
+    nav: { features: "الميزات", aboutUs: "عن التطبيق", faq: "الأسئلة الشائعة", contact: "اتصل بنا" },
+    contactBtn: "تواصل معنا",
+    contact: {
+      title: "تواصل معنا",
+      subtitle: "هل لديك أسئلة حول One Famory؟ نحب أن نسمع منك.",
+      form: {
+        name: "الاسم",
+        email: "البريد الإلكتروني",
+        subject: "الموضوع",
+        message: "الرسالة",
+        send: "إرسال الرسالة"
+      },
+      info: {
+        email: "contact@onefamory.com",
+        location: "جامعة جينان، الصين"
+      },
+      success: "تم إرسال الرسالة! سنرد عليك قريباً.",
+      backHome: "العودة للرئيسية"
+    },
     badge: "مسابقة جامعة جينان للابتكار AI+ 2026 — قيد التطوير",
 
     hero: {
@@ -130,8 +164,26 @@ export const translations = {
   },
 
   zh: {
-    nav: { features: "功能", aboutUs: "关于", faq: "常见问题" },
-    contact: "联系我们",
+    nav: { features: "功能", aboutUs: "关于", faq: "常见问题", contact: "联系我们" },
+     contactBtn: "联系我们",
+
+    contact: {
+      title: "联系我们",
+      subtitle: "对 One Famory 有疑问？我们很乐意收到您的来信。",
+      form: {
+        name: "您的姓名",
+        email: "电子邮箱",
+        subject: "主题",
+        message: "留言内容",
+        send: "发送消息"
+      },
+      info: {
+        email: "contact@onefamory.com",
+        location: "中国广州 暨南大学"
+      },
+      success: "消息已发送！我们会尽快回复您。",
+      backHome: "返回首页"
+    },
     badge: "暨南大学 AI+ 创新大赛 2026 — 开发中",
 
     hero: {
@@ -188,7 +240,7 @@ export const translations = {
       desc: "重新定义家庭连接方式。",
       pages: "页面",
       otherPages: "更多",
-      links: { home: "首页", features: "功能", aboutUs: "关于", faq: "常见问题", contact: "联系" },
+      links: { home: "首页", features: "功能", aboutUs: "关于", faq: "常见问题", contact: "联系我们" },
       otherLinks: { terms: "条款", privacy: "隐私", delete: "删除账户" },
       copyright: "© 2026 One Famory"
     }
