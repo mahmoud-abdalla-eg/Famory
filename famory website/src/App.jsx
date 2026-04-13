@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { translations } from "./constants/translations";
 import Navbar from "./components/Navbar";
-import HeroSection from "./components/HeroSection";
-import FeaturesSection from "./components/FeaturesSection";
-import AboutUsSection from "./components/AboutUsSection";
-import FAQSection from "./components/FAQSection";
-import CTASection from "./components/CTASection";
 import Footer from "./components/Footer";
+import { Route, Routes } from "react-router-dom";
+import Home from "./components/Home/Home";
+import Contact from "./components/ContactPage";
+import ScrollToHash from "./components/ScrollToHash";
 
 export default function App() {
   const [lang, setLang] = useState("en");
@@ -29,11 +28,13 @@ export default function App() {
       `}</style>
       
       <Navbar lang={lang} setLang={setLang} t={t} darkMode={darkMode} setDarkMode={setDarkMode} />
-      <HeroSection t={t} darkMode={darkMode} />
-      <FeaturesSection t={t} darkMode={darkMode} />
-      <AboutUsSection t={t} darkMode={darkMode} />
-      <FAQSection t={t} darkMode={darkMode} />
-      <CTASection t={t} darkMode={darkMode} />
+      
+      <ScrollToHash />
+
+      <Routes>
+         <Route path="/" element={<Home t={t} darkMode={darkMode} />} />
+         <Route path="/contact" element={<Contact t={t} darkMode={darkMode} />} />
+      </Routes>
       <Footer t={t} darkMode={darkMode} />
       <SpeedInsights />
     </div>
