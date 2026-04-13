@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { colors } from "../constants/colors";
+import { colors } from "../../constants/colors";
 
 export default function AboutUsSection({ t, darkMode }) {
   const sectionBg = darkMode ? "bg-[#1E293B]" : "bg-gradient-to-br from-[#EAF6FC] to-[#FFE6D5]/50";

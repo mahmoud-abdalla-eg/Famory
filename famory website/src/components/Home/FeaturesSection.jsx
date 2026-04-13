@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { featureColors, featureColorsDark } from "../constants/featureColors";
+import { featureColors, featureColorsDark } from "../../constants/featureColors";
 
 export default function FeaturesSection({ t, darkMode }) {
   const icons = [
