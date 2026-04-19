@@ -1,0 +1,135 @@
+{
+  "welcome1": "مرحبًا بك في One Famory",
+  "welcome1des": "المكان الذي يجمع عائلتك للبقاء على تواصل وحفظ ذكرياتكم معًا",
+
+  "welcome2": "ابقَ على تواصل",
+  "welcome2des": "تحدث، شارك اللحظات، وابقَ الجميع على اطلاع دائم",
+
+  "welcome3": "نظّموا معًا",
+  "welcome3des": "تقويمات ومهام مشتركة تبقي عائلتك على المسار الصحيح",
+
+  "welcome4": "احتفظ بالذكريات",
+  "welcome4des": "ذكريات عائلتك، دائمًا في متناول يدك",
+
+
+  "dashboardWelcomeTitle": "مرحبًا بعودتك",
+  "dashboardWelcomeSubtitle": "إليك ما يحدث مع عائلتك",
+  "familyChat": "دردشة العائلة",
+  "familyChatPreview": "أمي: لا تنسَ شراء البقالة!",
+  "minutesAgo2": "منذ دقيقتين",
+  "tasks": "المهام",
+  "tasksDoneSummary": "3 من 7 مكتملة",
+  "nextTaskToday": "التالي: إخراج القمامة (اليوم)",
+  "upcomingEvents": "الفعاليات القادمة",
+  "today": "اليوم",
+  "monthApr": "أبريل",
+  "soccerPractice": "تدريب كرة القدم",
+  "soccerPracticeTime": "4:00 م - 5:30 م",
+  "memoryLane": "ذكريات العائلة",
+  "onThisDay": "في مثل هذا اليوم",
+  "memoriesLastYear": "3 ذكريات من العام الماضي",
+  "settings": "الإعدادات",
+  "settingsSubtitle": "اللغة والإشعارات وتفضيلات التطبيق",
+
+"quickSettings": "الإعدادات السريعة",
+  "language": "اللغة",
+  "profileSettings": "إعدادات الملف الشخصي",
+  "notifications": "الإشعارات",
+  "privacySecurity": "الخصوصية والأمان",
+  "languageRegion": "اللغة والمنطقة",
+
+  "loginTitle": "مرحبًا بعودتك",
+  "emailPlaceholder": "البريد الإلكتروني",
+  "passwordPlaceholder": "كلمة المرور",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "loginButton": "تسجيل الدخول",
+  "registerPrompt": "أنشئ عائلتك أو انضم إليها",
+  "registerNow": "إنشاء حساب",
+  "continueWith": "أو المتابعة عبر",
+
+  "googleLogin": "المتابعة عبر Google",
+  "appleLogin": "المتابعة عبر Apple",
+  "facebookLogin": "المتابعة عبر Facebook",
+  "wechatLogin": "المتابعة عبر WeChat",
+
+  "signupTitle": "أنشئ حسابك",
+  "signupSubtitle": "ابدأ مساحة عائلتك خلال ثوانٍ",
+
+  "nameLabel": "الاسم الكامل",
+  "namePlaceholder": "أدخل اسمك الكامل",
+
+  "emailLabel": "البريد الإلكتروني",
+  "emailSignupPlaceholder": "name@email.com",
+
+  "passwordLabel": "كلمة المرور",
+  "passwordSignupPlaceholder": "أنشئ كلمة مرور آمنة",
+
+  "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+
+  "genderLabel": "الجنس",
+  "genderMale": "ذكر",
+  "genderFemale": "أنثى",
+
+  "termsText": "أوافق على",
+  "termsLink": "الشروط والأحكام",
+  "privacyLink": "سياسة الخصوصية",
+
+  "signupButton": "ابدأ الآن",
+
+  "haveAccount": "هل لديك حساب بالفعل؟",
+  "loginNow": "تسجيل الدخول",
+
+  "familyTitle": "أنشئ أو انضم إلى عائلة",
+  "familySubtitle": "عائلتك تبدأ من هنا",
+
+  "createFamilyTitle": "إنشاء عائلة",
+  "createFamilyDesc": "أنشئ مساحة عائلتك وادعُ الأعضاء",
+  "createFamilyBtn": "إنشاء",
+
+  "joinFamilyTitle": "الانضمام إلى عائلة",
+  "joinFamilyDesc": "انضم باستخدام رمز QR أو كود الدعوة",
+  "joinFamilyBtn": "انضم",
+
+  "needHelp": "تحتاج مساعدة؟",
+  "askMember": "اسأل أحد أفراد العائلة",
+
+  "joinNowTitle": "انضم إلى عائلتك",
+  "joinNowSubtitle": "امسح رمز QR أو أدخل الكود للانضمام",
+
+  "scanQrTitle": "مسح رمز QR",
+  "scanQrDesc": "استخدم الكاميرا لمسح رمز العائلة",
+  "scanQrBtn": "مسح",
+
+  "scanGalleryTitle": "رفع من المعرض",
+  "scanGalleryDesc": "اختر صورة رمز QR من المعرض",
+  "scanGalleryBtn": "رفع",
+
+  "enterCodeTitle": "إدخال الكود",
+  "enterCodeDesc": "أدخل كود الدعوة الذي شاركته عائلتك",
+  "enterCodePlaceholder": "أدخل الكود",
+  "enterCodeBtn": "انضم",
+
+  "createFamilyScreenTitle": "أنشئ عائلتك",
+  "createFamilyScreenSubtitle": "ابدأ مساحتك العائلية الخاصة",
+
+  "groupPhotoLabel": "صورة العائلة (اختياري)",
+  "uploadPhoto": "رفع صورة",
+
+  "familyNameLabel": "اسم العائلة",
+  "familyNamePlaceholder": "مثال: عائلة أحمد",
+
+  "familyTypeLabel": "نوع العائلة",
+  "familyTypeNuclear": "عائلة نووية",
+  "familyTypeBlended": "عائلة مختلطة",
+  "familyTypeOther": "أخرى",
+
+  "familyEthnicityLabel": "الأصل (اختياري)",
+  "familyEthnicityPlaceholder": "اختر الأصل",
+
+  "yourRoleLabel": "دورك في العائلة",
+  "yourRolePlaceholder": "مثال: أب، أم، أحمد",
+
+  "createFamilySubmit": "إنشاء العائلة",
+
+  "inviteLaterNote": "يمكنك دعوة الأعضاء بعد إنشاء العائلة"
+}

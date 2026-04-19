@@ -1,0 +1,135 @@
+{
+  "welcome1": "Welcome to One Famory",
+  "welcome1des": "Your family's home base to stay connected and keep your memories together",
+
+  "welcome2": "Stay Connected",
+  "welcome2des": "Chat, share moments, and keep everyone in sync",
+
+  "welcome3": "Organize Together",
+  "welcome3des": "Shared calendars and tasks that keep your family on track",
+
+  "welcome4": "Cherish Memories",
+  "welcome4des": "Your family’s memories, always within reach",
+
+  "dashboardWelcomeTitle": "Welcome Home",
+  "dashboardWelcomeSubtitle": "Here's what's happening with your family",
+  "familyChat": "Family Chat",
+  "familyChatPreview": "Mom: Don't forget to pick up groceries!",
+  "minutesAgo2": "2 minutes ago",
+  "tasks": "Tasks",
+  "tasksDoneSummary": "3 of 7 done",
+  "nextTaskToday": "Next: Take out trash (Due today)",
+  "upcomingEvents": "Upcoming Events",
+  "today": "Today",
+  "monthApr": "APR",
+  "soccerPractice": "Soccer Practice",
+  "soccerPracticeTime": "4:00 PM - 5:30 PM",
+  "memoryLane": "Memory Lane",
+  "onThisDay": "On This Day",
+  "memoriesLastYear": "3 memories from last year",
+  "settings": "Settings",
+  "settingsSubtitle": "Language, notifications, and app preferences",
+  
+  "quickSettings": "Quick Settings",
+  "language": "Language",
+  "profileSettings": "Profile Settings",
+  "notifications": "Notifications",
+  "privacySecurity": "Privacy & Security",
+  "languageRegion": "Language & Region",
+
+
+  "loginTitle": "Welcome back",
+  "emailPlaceholder": "Email address",
+  "passwordPlaceholder": "Password",
+  "forgotPassword": "Forgot password?",
+  "loginButton": "Log in",
+  "registerPrompt": "Create or join your family",
+  "registerNow": "Sign up",
+  "continueWith": "Or continue with",
+
+  "googleLogin": "Continue with Google",
+  "appleLogin": "Continue with Apple",
+  "facebookLogin": "Continue with Facebook",
+  "wechatLogin": "Continue with WeChat",
+
+  "signupTitle": "Create your account",
+  "signupSubtitle": "Start your family space in seconds",
+
+  "nameLabel": "Full name",
+  "namePlaceholder": "Enter your full name",
+
+  "emailLabel": "Email address",
+  "emailSignupPlaceholder": "name@email.com",
+
+  "passwordLabel": "Password",
+  "passwordSignupPlaceholder": "Create a secure password",
+
+  "confirmPasswordPlaceholder": "Confirm your password",
+
+  "genderLabel": "Gender",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+
+  "termsText": "I agree to the",
+  "termsLink": "Terms & Conditions",
+  "privacyLink": "Privacy Policy",
+
+  "signupButton": "Get started",
+
+  "haveAccount": "Already have an account?",
+  "loginNow": "Log in",
+
+  "familyTitle": "Create or Join a Family",
+  "familySubtitle": "Your family starts here",
+
+  "createFamilyTitle": "Create a Family",
+  "createFamilyDesc": "Set up your family space and invite members",
+  "createFamilyBtn": "Create",
+
+  "joinFamilyTitle": "Join a Family",
+  "joinFamilyDesc": "Join using a QR code or invite code",
+  "joinFamilyBtn": "Join",
+
+  "needHelp": "Need help?",
+  "askMember": "Ask a family member",
+
+  "joinNowTitle": "Join Your Family",
+  "joinNowSubtitle": "Scan a QR code or enter a code to join",
+
+  "scanQrTitle": "Scan QR Code",
+  "scanQrDesc": "Use your camera to scan the family QR code",
+  "scanQrBtn": "Scan",
+
+  "scanGalleryTitle": "Upload from Gallery",
+  "scanGalleryDesc": "Select a QR code image from your gallery",
+  "scanGalleryBtn": "Upload",
+
+  "enterCodeTitle": "Enter Code",
+  "enterCodeDesc": "Enter the invite code shared by your family",
+  "enterCodePlaceholder": "Enter code",
+  "enterCodeBtn": "Join",
+
+  "createFamilyScreenTitle": "Create Your Family",
+  "createFamilyScreenSubtitle": "Set up your private family space",
+
+  "groupPhotoLabel": "Family photo (optional)",
+  "uploadPhoto": "Upload photo",
+
+  "familyNameLabel": "Family name",
+  "familyNamePlaceholder": "e.g. The Smith Family",
+
+  "familyTypeLabel": "Family type",
+  "familyTypeNuclear": "Nuclear",
+  "familyTypeBlended": "Blended",
+  "familyTypeOther": "Other",
+
+  "familyEthnicityLabel": "Ethnicity (optional)",
+  "familyEthnicityPlaceholder": "Select ethnicity",
+
+  "yourRoleLabel": "Your role in the family",
+  "yourRolePlaceholder": "e.g. Dad, Mom, John",
+
+  "createFamilySubmit": "Create family",
+
+  "inviteLaterNote": "You can invite members after creating your family"
+}
