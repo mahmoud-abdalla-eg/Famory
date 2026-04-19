@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   cupertino_icons: ^1.0.2
   # Only add these if you need real file/photo selection
   # file_picker: ^8.0.0
@@ -23,3 +25,20 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - translation/en/translations.json
+    - translation/ar/translations.json
+    - translation/cn/translations.json
+
+
+  fonts:
+    - family: Araboto
+      fonts:
+        - asset: assets/fonts/Araboto-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Araboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Araboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Araboto-Black.ttf
+          weight: 900  

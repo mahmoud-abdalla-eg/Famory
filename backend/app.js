@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const baseURL = "/api/V1/";
+const baseURL = "/api/V1/"; // API versioning base URL
 const adminRouter = require("./routers/admin");
 const usersRouter = require("./routers/users");
 const morgan = require("morgan");
@@ -11,7 +11,7 @@ const morgan = require("morgan");
 const { setServers } = require("node:dns/promises");
 setServers(["1.1.1.1", "8.8.8.8"]);
 
-
+// Middleware
 app.use(morgan("dev"));
 app.use(express.json());
 // app.use("/uploads", express.static("./uploads"));
