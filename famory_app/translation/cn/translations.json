@@ -1,0 +1,136 @@
+{
+  "welcome1": "欢迎来到 One Famory",
+  "welcome1des": "一个让家人保持联系、珍藏回忆的一站式家庭空间",
+
+  "welcome2": "保持联系",
+  "welcome2des": "聊天、分享瞬间，让每个人都保持同步",
+
+  "welcome3": "一起管理",
+  "welcome3des": "共享日历和任务，让家庭生活更有条理",
+
+  "welcome4": "珍藏回忆",
+  "welcome4des": "家庭的美好回忆，随时触手可及",
+  
+
+
+  "dashboardWelcomeTitle": "欢迎回家",
+  "dashboardWelcomeSubtitle": "看看你的家庭最近发生了什么",
+  "familyChat": "家庭聊天",
+  "familyChatPreview": "妈妈：别忘了买杂货！",
+  "minutesAgo2": "2分钟前",
+  "tasks": "任务",
+  "tasksDoneSummary": "已完成 7 项中的 3 项",
+  "nextTaskToday": "下一项：倒垃圾（今天到期）",
+  "upcomingEvents": "即将到来的活动",
+  "today": "今天",
+  "monthApr": "4月",
+  "soccerPractice": "足球训练",
+  "soccerPracticeTime": "4:00 PM - 5:30 PM",
+  "memoryLane": "回忆时光",
+  "onThisDay": "历史上的今天",
+  "memoriesLastYear": "去年的 3 条回忆",
+  "settings": "设置",
+  "settingsSubtitle": "语言、通知和应用偏好",
+
+   "quickSettings": "快速设置",
+  "language": "语言",
+  "profileSettings": "个人资料设置",
+  "notifications": "通知",
+  "privacySecurity": "隐私与安全",
+  "languageRegion": "语言和地区",
+
+  "loginTitle": "欢迎回来",
+  "emailPlaceholder": "邮箱地址",
+  "passwordPlaceholder": "密码",
+  "forgotPassword": "忘记密码？",
+  "loginButton": "登录",
+  "registerPrompt": "创建或加入你的家庭",
+  "registerNow": "注册",
+  "continueWith": "或使用以下方式继续",
+
+  "googleLogin": "使用 Google 继续",
+  "appleLogin": "使用 Apple 继续",
+  "facebookLogin": "使用 Facebook 继续",
+  "wechatLogin": "使用微信继续",
+
+  "signupTitle": "创建你的账号",
+  "signupSubtitle": "几秒钟内开启你的家庭空间",
+
+  "nameLabel": "姓名",
+  "namePlaceholder": "输入你的姓名",
+
+  "emailLabel": "邮箱地址",
+  "emailSignupPlaceholder": "name@email.com",
+
+  "passwordLabel": "密码",
+  "passwordSignupPlaceholder": "设置一个安全密码",
+
+  "confirmPasswordPlaceholder": "确认密码",
+
+  "genderLabel": "性别",
+  "genderMale": "男",
+  "genderFemale": "女",
+
+  "termsText": "我同意",
+  "termsLink": "条款与条件",
+  "privacyLink": "隐私政策",
+
+  "signupButton": "开始使用",
+
+  "haveAccount": "已有账号？",
+  "loginNow": "登录",
+
+  "familyTitle": "创建或加入家庭",
+  "familySubtitle": "从这里开始你的家庭空间",
+
+  "createFamilyTitle": "创建家庭",
+  "createFamilyDesc": "创建你的家庭并邀请成员加入",
+  "createFamilyBtn": "创建",
+
+  "joinFamilyTitle": "加入家庭",
+  "joinFamilyDesc": "通过二维码或邀请码加入",
+  "joinFamilyBtn": "加入",
+
+  "needHelp": "需要帮助？",
+  "askMember": "向家人咨询",
+
+  "joinNowTitle": "加入你的家庭",
+  "joinNowSubtitle": "扫描二维码或输入邀请码加入",
+
+  "scanQrTitle": "扫描二维码",
+  "scanQrDesc": "使用相机扫描家庭二维码",
+  "scanQrBtn": "扫描",
+
+  "scanGalleryTitle": "从相册上传",
+  "scanGalleryDesc": "从相册选择二维码图片",
+  "scanGalleryBtn": "上传",
+
+  "enterCodeTitle": "输入邀请码",
+  "enterCodeDesc": "输入家人分享的邀请码",
+  "enterCodePlaceholder": "输入邀请码",
+  "enterCodeBtn": "加入",
+
+  "createFamilyScreenTitle": "创建你的家庭",
+  "createFamilyScreenSubtitle": "开始你的私人家庭空间",
+
+  "groupPhotoLabel": "家庭照片（可选）",
+  "uploadPhoto": "上传照片",
+
+  "familyNameLabel": "家庭名称",
+  "familyNamePlaceholder": "例如：Smith 家庭",
+
+  "familyTypeLabel": "家庭类型",
+  "familyTypeNuclear": "核心家庭",
+  "familyTypeBlended": "重组家庭",
+  "familyTypeOther": "其他",
+
+  "familyEthnicityLabel": "家庭背景（可选）",
+  "familyEthnicityPlaceholder": "选择背景",
+
+  "yourRoleLabel": "你在家庭中的角色",
+  "yourRolePlaceholder": "例如：爸爸、妈妈、John",
+
+  "createFamilySubmit": "创建家庭",
+
+  "inviteLaterNote": "创建后可邀请家庭成员加入"
+}

@@ -5,20 +5,12 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Define the new build directory for the root project
+val newBuildDir = rootProject.layout.projectDirectory.dir("../../build")
+rootProject.layout.buildDirectory.set(newBuildDir)
 
+// Configure subprojects to use a specific build directory
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
+    project.layout.buildDirectory.set(newSubprojectBuildDir)  // Set the build directory for each subproject
 }

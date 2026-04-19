@@ -53,7 +53,7 @@ class AppRadius {
 class AppShadows {
   static List<BoxShadow> soft = [
     BoxShadow(
-      color: Colors.black.withValues(alpha: 0.05),
+      color: Colors.black.withValues(alpha:0.05),
       blurRadius: 10,
       offset: const Offset(0, 2),
     ),
@@ -61,7 +61,7 @@ class AppShadows {
 
   static List<BoxShadow> medium = [
     BoxShadow(
-      color: Colors.black.withValues(alpha: 0.08),
+      color: Colors.black.withValues(alpha:0.08),
       blurRadius: 16,
       offset: const Offset(0, 4),
     ),
@@ -69,7 +69,7 @@ class AppShadows {
 
   static List<BoxShadow> elevated = [
     BoxShadow(
-      color: Colors.black.withValues(alpha: 0.12),
+      color: Colors.black.withValues(alpha:0.12),
       blurRadius: 24,
       offset: const Offset(0, 8),
     ),
@@ -77,125 +77,218 @@ class AppShadows {
 }
 
 class AppTheme {
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    scaffoldBackgroundColor: AppColors.bgMain,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.primaryBlue,
-      secondary: AppColors.accentOrange,
-      tertiary: AppColors.successGreen,
-      surface: AppColors.cardWhite,
-      error: AppColors.error,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onTertiary: Colors.white,
-      onSurface: AppColors.textPrimary,
-    ),
-    fontFamily: 'SF Pro',
-    textTheme: const TextTheme(
+  static const String appFontFamily = 'Araboto';
+
+  static ThemeData get lightTheme {
+    const textTheme = TextTheme(
       // Display Styles
       displayLarge: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 32,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
         height: 1.2,
-        letterSpacing: -0.5,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        height: 1.3,
         letterSpacing: -0.3,
       ),
+      displayMedium: TextStyle(
+        fontFamily: appFontFamily,
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        height: 1.3,
+        letterSpacing: -0.2,
+      ),
       displaySmall: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 20,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
-        height: 1.4,
+        height: 1.35,
       ),
+
       // Headline Styles
       headlineMedium: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
         height: 1.4,
       ),
       headlineSmall: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
-        height: 1.5,
+        height: 1.45,
       ),
+
       // Body Styles
       bodyLarge: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: AppColors.textPrimary,
         height: 1.5,
       ),
       bodyMedium: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
         height: 1.5,
       ),
       bodySmall: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w400,
         color: AppColors.textSecondary,
         height: 1.4,
       ),
+
       // Label Styles
       labelLarge: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 16,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
-        height: 1.5,
+        height: 1.45,
       ),
       labelMedium: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: AppColors.textPrimary,
-        height: 1.5,
+        height: 1.45,
       ),
       labelSmall: TextStyle(
+        fontFamily: appFontFamily,
         fontSize: 12,
         fontWeight: FontWeight.w600,
         color: AppColors.textSecondary,
-        letterSpacing: 0.5,
+        letterSpacing: 0.2,
         height: 1.3,
       ),
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      iconTheme: IconThemeData(color: AppColors.deepBlue),
-      titleTextStyle: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      fontFamily: appFontFamily,
+      scaffoldBackgroundColor: AppColors.bgMain,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.primaryBlue,
+        secondary: AppColors.accentOrange,
+        tertiary: AppColors.successGreen,
+        surface: AppColors.cardWhite,
+        error: AppColors.error,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onTertiary: Colors.white,
+        onSurface: AppColors.textPrimary,
       ),
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primaryBlue,
-      foregroundColor: Colors.white,
-      elevation: 4,
-      shape: CircleBorder(),
-    ),
-    cardTheme: CardThemeData(
-      color: AppColors.cardWhite,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.xl),
+      textTheme: textTheme,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: IconThemeData(color: AppColors.deepBlue),
+        titleTextStyle: TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
+          height: 1.2,
+        ),
       ),
-      margin: EdgeInsets.zero,
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.borderGray,
-      thickness: 1,
-      space: 0,
-    ),
-  );
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primaryBlue,
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: CircleBorder(),
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.cardWhite,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.borderGray,
+        thickness: 1,
+        space: 0,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.cardWhite,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: const BorderSide(color: AppColors.borderGray),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: const BorderSide(color: AppColors.borderGray),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderSide: const BorderSide(
+            color: AppColors.primaryBlue,
+            width: 1.4,
+          ),
+        ),
+        hintStyle: const TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: AppColors.textSecondary,
+        ),
+        labelStyle: const TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          textStyle: const TextStyle(
+            fontFamily: appFontFamily,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          elevation: 0,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          textStyle: const TextStyle(
+            fontFamily: appFontFamily,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        selectedItemColor: AppColors.primaryBlue,
+        unselectedItemColor: AppColors.textSecondary,
+        selectedLabelStyle: TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: appFontFamily,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
 }
