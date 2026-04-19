@@ -5,8 +5,9 @@ allprojects {
     }
 }
 
-// Define the new build directory for the root project
-val newBuildDir = rootProject.layout.projectDirectory.dir("../../build")
+// Keep Android outputs under the Flutter app's build directory so Flutter tooling
+// can find generated APKs at the expected path.
+val newBuildDir = rootProject.layout.projectDirectory.dir("../build")
 rootProject.layout.buildDirectory.set(newBuildDir)
 
 // Configure subprojects to use a specific build directory
