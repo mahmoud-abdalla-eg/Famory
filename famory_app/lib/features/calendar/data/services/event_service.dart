@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/calendar_event.dart';
 import '../../../../theme.dart';
 
+export '../models/calendar_event.dart';
+
 /// Global Event Service - Shared between Chat AI and Calendar
 class EventService {
   static final EventService _instance = EventService._internal();
@@ -47,23 +49,29 @@ class EventService {
 
   List<CalendarEventModel> getEventsForDate(DateTime date) {
     return _events.where((event) {
-      return event.date.year == date.year &&
-          event.date.month == date.month &&
-          event.date.day == date.day;
+      final eventDate = event.date;
+      if (eventDate == null) return false;
+      return eventDate.year == date.year &&
+          eventDate.month == date.month &&
+          eventDate.day == date.day;
     }).toList();
   }
 
   List<CalendarEventModel> getEventsForMonth(int year, int month) {
     return _events.where((event) {
-      return event.date.year == year && event.date.month == month;
+      final eventDate = event.date;
+      if (eventDate == null) return false;
+      return eventDate.year == year && eventDate.month == month;
     }).toList();
   }
 
   bool hasEventsOnDate(DateTime date) {
     return _events.any((event) {
-      return event.date.year == date.year &&
-          event.date.month == date.month &&
-          event.date.day == date.day;
+      final eventDate = event.date;
+      if (eventDate == null) return false;
+      return eventDate.year == date.year &&
+          eventDate.month == date.month &&
+          eventDate.day == date.day;
     });
   }
 
