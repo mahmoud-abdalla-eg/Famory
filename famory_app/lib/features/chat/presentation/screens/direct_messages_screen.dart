@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../theme.dart';
 import '../../../calendar/data/services/event_service.dart';
-import '../../../calendar/data/models/calendar_event.dart';
 
 /// Enhanced Chat Screen with AI Assistant, Mentions, Emoji, Voice, Attachments
 class ChatScreenEnhanced extends StatefulWidget {
