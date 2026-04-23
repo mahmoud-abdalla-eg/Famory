@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme.dart';
+import '../core/theme/app_colors.dart';
 
 class NavItem {
   final String id;
@@ -34,7 +34,7 @@ class BottomNav extends StatelessWidget {
         color: Colors.white,
         border: Border(
           top: BorderSide(
-            color: AppColors.borderGray,
+            color: AppColors.g200,
             width: 1,
           ),
         ),
@@ -53,13 +53,13 @@ class BottomNav extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isActive ? AppColors.softBlueBg : Colors.transparent,
+                    color: isActive ? AppColors.blueL : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     tab.icon,
                     size: 24,
-                    color: isActive ? AppColors.primaryBlue : AppColors.textSecondary,
+                    color: isActive ? AppColors.blue : AppColors.g400,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -68,7 +68,7 @@ class BottomNav extends StatelessWidget {
                   width: isActive ? 4 : 0,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryBlue,
+                    color: AppColors.blue,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

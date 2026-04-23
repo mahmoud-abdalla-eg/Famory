@@ -1,453 +1,76 @@
 import 'package:flutter/material.dart';
-import '../../../../app_localizations.dart';
-import '../../../../theme.dart';
-import '../../../../widgets/custom_avatar.dart';
-import '../../../../widgets/feature_card.dart';
+import 'package:get/get.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 
-class DashboardScreen extends StatelessWidget {
-  final Function(String) onNavigate;
-
-  const DashboardScreen({super.key, required this.onNavigate});
+class EmptyDashboardScreen extends StatelessWidget {
+  const EmptyDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context);
-
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const CustomAvatar(
-                    name: 'Sarah Miller',
-                    size: AvatarSize.large,
-                  ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => onNavigate('settings'),
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppColors.softBlueBg,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(
-                            Icons.settings_rounded,
-                            color: AppColors.deepBlue,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Stack(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.softBlueBg,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Icon(
-                              Icons.notifications_rounded,
-                              color: AppColors.deepBlue,
-                              size: 20,
-                            ),
-                          ),
-                          Positioned(
-                            top: 4,
-                            right: 4,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.accentOrange,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                t.translate('dashboardWelcomeTitle'),
-                style: Theme.of(context).textTheme.displayLarge,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                t.translate('dashboardWelcomeSubtitle'),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(24),
+    return Scaffold(
+      backgroundColor: AppColors.g50,
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             children: [
-              FeatureCard(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF3EB6EC), Color(0xFF2E9ECE)],
-                ),
-                onTap: () => onNavigate('chat'),
+              const _Header(
+                name: 'Name',
+                subtitle: 'Welcome! Let\'s get your family setup.',
+                avatarInitial: 'N',
+                showAdd: true,
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.translate('familyChat'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Araboto',
-                          ),
-                        ),
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha:0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              '3',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontFamily: 'Araboto',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      t.translate('familyChatPreview'),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'Araboto',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      t.translate('minutesAgo2'),
+                    const Text(
+                      'Your Family Setup',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha:0.7),
-                        fontSize: 12,
-                        fontFamily: 'Araboto',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              FeatureCard(
-                color: Colors.white,
-                onTap: () => onNavigate('tasks'),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.translate('tasks'),
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Araboto',
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightMint,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            t.translate('tasksDoneSummary'),
-                            style: const TextStyle(
-                              color: AppColors.successGreen,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: 'Araboto',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 1000),
-                        tween: Tween<double>(begin: 0, end: 0.43),
-                        builder: (context, double value, child) {
-                          return LinearProgressIndicator(
-                            value: value,
-                            backgroundColor: AppColors.bgMain,
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              AppColors.successGreen,
-                            ),
-                            minHeight: 8,
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      t.translate('nextTaskToday'),
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
                         fontSize: 14,
-                        fontFamily: 'Araboto',
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.g700,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              FeatureCard(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFFFE6D5), Color(0xFFFF8C42)],
-                ),
-                onTap: () => onNavigate('calendar'),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.translate('upcomingEvents'),
-                          style: const TextStyle(
-                            color: AppColors.deepBlue,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Araboto',
-                          ),
-                        ),
-                        Text(
-                          t.translate('today'),
-                          style: const TextStyle(
-                            color: AppColors.deepBlue,
+                    const SizedBox(height: 14),
+                    _ActionCard(
+                      icon: Icons.groups_rounded,
+                      iconColor: const Color(0xFFFF8C42),
+                      iconBg: const Color(0xFFFFE6D5),
+                      title: 'Create a Family',
+                      subtitle: 'Create your family and invite members',
+                      buttonLabel: 'Create',
+                      onTap: () => Get.toNamed(AppRoutes.familyCreate),
+                    ),
+                    const SizedBox(height: 18),
+                    _ActionCard(
+                      icon: Icons.group_rounded,
+                      iconColor: const Color(0xFF4CB4EC),
+                      iconBg: const Color(0xFFEAF6FC),
+                      title: 'Join a Family',
+                      subtitle: 'Join a family using QR code or code',
+                      buttonLabel: 'Open',
+                      onTap: () => Get.toNamed(AppRoutes.familyJoin),
+                    ),
+                    const SizedBox(height: 40),
+                    Center(
+                      child: RichText(
+                        text: const TextSpan(
+                          style: TextStyle(
                             fontSize: 12,
-                            fontFamily: 'Araboto',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha:0.5),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                t.translate('monthApr'),
-                                style: const TextStyle(
-                                  color: AppColors.deepBlue,
-                                  fontSize: 10,
-                                  fontFamily: 'Araboto',
-                                ),
-                              ),
-                              const Text(
-                                '11',
-                                style: TextStyle(
-                                  color: AppColors.deepBlue,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'Araboto',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                t.translate('soccerPractice'),
-                                style: const TextStyle(
-                                  color: AppColors.deepBlue,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Araboto',
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                t.translate('soccerPracticeTime'),
-                                style: const TextStyle(
-                                  color: AppColors.deepBlue,
-                                  fontSize: 12,
-                                  fontFamily: 'Araboto',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              FeatureCard(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFFEAF6FC), Color(0xFFFFE6D5)],
-                ),
-                onTap: () => onNavigate('photos'),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          t.translate('memoryLane'),
-                          style: const TextStyle(
-                            color: AppColors.deepBlue,
-                            fontSize: 16,
+                            color: AppColors.g500,
                             fontWeight: FontWeight.w600,
-                            fontFamily: 'Araboto',
                           ),
+                          children: [
+                            TextSpan(text: 'Need Help? '),
+                            TextSpan(
+                              text: 'Ask a family member',
+                              style: TextStyle(color: AppColors.blue, fontWeight: FontWeight.w700),
+                            ),
+                          ],
                         ),
-                        Text(
-                          t.translate('onThisDay'),
-                          style: const TextStyle(
-                            color: AppColors.deepBlue,
-                            fontSize: 12,
-                            fontFamily: 'Araboto',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [1, 2, 3].map((i) {
-                        return Expanded(
-                          child: Container(
-                            margin: i < 3
-                                ? const EdgeInsets.only(right: 8)
-                                : EdgeInsets.zero,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppColors.primaryBlue.withValues(alpha:0.2),
-                                  AppColors.accentOrange.withValues(alpha:0.2),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      t.translate('memoriesLastYear'),
-                      style: TextStyle(
-                        color: AppColors.deepBlue.withValues(alpha:0.7),
-                        fontSize: 12,
-                        fontFamily: 'Araboto',
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              FeatureCard(
-                color: Colors.white,
-                onTap: () => onNavigate('settings'),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlueBg,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.settings_rounded,
-                        color: AppColors.deepBlue,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            t.translate('settings'),
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Araboto',
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            t.translate('settingsSubtitle'),
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 13,
-                              fontFamily: 'Araboto',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.textSecondary,
                     ),
                   ],
                 ),
@@ -455,7 +78,206 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final String name;
+  final String subtitle;
+  final String avatarInitial;
+  final bool showAdd;
+
+  const _Header({
+    required this.name,
+    required this.subtitle,
+    required this.avatarInitial,
+    required this.showAdd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6E40E7),
+        borderRadius: BorderRadius.circular(26),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _Avatar(avatarInitial: avatarInitial),
+              const Spacer(),
+              const _TopIcon(icon: Icons.settings_rounded),
+              if (showAdd) ...[
+                const SizedBox(width: 8),
+                const _TopIcon(icon: Icons.add_circle_outline_rounded),
+              ],
+            ],
+          ),
+          const SizedBox(height: 32),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  'Good Morning {$name}',
+                  style: const TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.72),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  final String avatarInitial;
+
+  const _Avatar({required this.avatarInitial});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          avatarInitial,
+          style: const TextStyle(
+            color: Color(0xFF91B9FF),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _TopIcon({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(icon, color: Colors.white, size: 22);
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final String title;
+  final String subtitle;
+  final String buttonLabel;
+  final VoidCallback onTap;
+
+  const _ActionCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.title,
+    required this.subtitle,
+    required this.buttonLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.g200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: iconColor, size: 28),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.g900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 12, color: AppColors.g500, height: 1.3),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: SizedBox(
+                    width: 112,
+                    height: 36,
+                    child: ElevatedButton(
+                      onPressed: onTap,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0D6EFD),
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        buttonLabel,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
