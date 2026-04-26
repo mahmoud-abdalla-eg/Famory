@@ -3,9 +3,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../data/models/calendar_event.dart';
 
 /// Bottom sheet shown when the user taps "+ Event" on the Calendar screen.
-/// Calls [onEventAdded] with the new [CalendarEvent] when confirmed.
+/// Calls [onEventAdded] with the new [CalendarEventModel] when confirmed.
 class CreateEventScreen extends StatefulWidget {
-  final void Function(CalendarEvent event) onEventAdded;
+  final void Function(CalendarEventModel event) onEventAdded;
 
   const CreateEventScreen({super.key, required this.onEventAdded});
 
@@ -42,7 +42,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
     // Pick a color based on how many events already exist (caller increments)
     widget.onEventAdded(
-      CalendarEvent(
+      CalendarEventModel(
         title: title,
         time:  _timeCtrl.text.isNotEmpty ? _timeCtrl.text : '12:00 PM',
         who:   _who,
