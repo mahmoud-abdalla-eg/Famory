@@ -17,6 +17,8 @@ dependencies:
   # MOVED HERE: These are required for the app to run
   get: ^4.6.5
   shared_preferences: ^2.2.2
+  image_picker: ^1.1.2
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +33,7 @@ flutter:
     - translation/en/translations.json
     - translation/ar/translations.json
     - translation/cn/translations.json
+    - .env
 
   fonts:
     - family: Araboto

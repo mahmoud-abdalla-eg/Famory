@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/services/family_service.dart';
 
 class JoinFamilySetupScreen extends StatefulWidget {
@@ -20,21 +21,47 @@ class _JoinFamilySetupScreenState extends State<JoinFamilySetupScreen> {
     super.dispose();
   }
 
-  void _finish() {
+  Future<void> _finish() async {
     final args = (Get.arguments as Map?) ?? {};
-    final familyName = (args['familyName'] as String?) ?? 'Parker Family';
-    FamilyService().joinFamily(
-      familyNameInput: familyName,
-      memberName: 'You',
-      role: _roleCtrl.text.trim().isEmpty ? 'Member' : _roleCtrl.text.trim(),
-    );
-    Get.offAllNamed(AppRoutes.home);
+    final inviteCode = (args['inviteCode'] ?? args['familyCode'])?.toString() ?? '';
+    final role = _roleCtrl.text.trim().isEmpty ? 'Member' : _roleCtrl.text.trim();
+
+    try {
+      if (args['alreadyJoined'] == true) {
+        await FamilyService().updateCurrentUserFamilyProfile(
+          memberName: _currentUserName(),
+          role: role,
+        );
+      } else {
+        await FamilyService().joinFamily(
+          inviteCode: inviteCode,
+          memberName: _currentUserName(),
+          role: role,
+        );
+      }
+      Get.offAllNamed(AppRoutes.home);
+    } catch (error) {
+      Get.snackbar(
+        'Join family failed',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'You';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'You' : name;
   }
 
   @override
   Widget build(BuildContext context) {
     final args = (Get.arguments as Map?) ?? {};
-    final familyName = (args['familyName'] as String?) ?? 'Parker Family';
+    final familyName = args['familyName']?.toString() ?? 'Parker Family';
 
     return Scaffold(
       backgroundColor: AppColors.g50,
@@ -48,12 +75,12 @@ class _JoinFamilySetupScreenState extends State<JoinFamilySetupScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
+                    Center(
                       child: Column(
                         children: [
-                          Text('Welcome to your Family {Name}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.g900)),
-                          SizedBox(height: 4),
-                          Text('Answer these questions', style: TextStyle(fontSize: 12, color: AppColors.g500)),
+                          Text('Welcome to $familyName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.g900)),
+                          const SizedBox(height: 4),
+                          const Text('Answer these questions', style: TextStyle(fontSize: 12, color: AppColors.g500)),
                         ],
                       ),
                     ),
@@ -123,7 +150,7 @@ class _JoinFamilySetupScreenState extends State<JoinFamilySetupScreen> {
                       width: double.infinity,
                       height: 46,
                       child: ElevatedButton(
-                        onPressed: () => Get.offAllNamed(AppRoutes.home),
+                        onPressed: _finish,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.blue,
                           foregroundColor: Colors.white,
@@ -149,11 +176,13 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = _currentUserName();
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: const BoxDecoration(
-        color: Color(0xFF6E40E7),
+        color: AppColors.dashboardPurple,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -161,9 +190,9 @@ class _Header extends StatelessWidget {
           topRight: Radius.circular(24),
         ),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Row(
+          const Row(
             children: [
               _Avatar(),
               Spacer(),
@@ -172,11 +201,20 @@ class _Header extends StatelessWidget {
               _TopIcon(icon: Icons.add_circle_outline_rounded),
             ],
           ),
-          SizedBox(height: 30),
-          Text('Good Morning {Name}', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 30),
+          Text('Good Morning $displayName', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         ],
       ),
     );
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'Name';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'Name' : name;
   }
 }
 

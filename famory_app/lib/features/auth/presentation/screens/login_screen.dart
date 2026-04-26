@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
-import 'signup_screen.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,7 +14,16 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  late final AuthProvider _authProvider;
   bool _obscurePass = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _authProvider = Get.isRegistered<AuthProvider>()
+        ? Get.find<AuthProvider>()
+        : Get.put(AuthProvider(), permanent: true);
+  }
 
   @override
   void dispose() {
@@ -25,49 +34,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenH = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
+      backgroundColor: AppColors.g50,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── Hero image ──────────────────────────────────────────────
-            SizedBox(
-              height: screenH * 0.38,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.network(
-                    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=500&fit=crop&crop=faces',
-                    fit: BoxFit.cover,
-                  ),
-                  // Status bar overlay
-                  Positioned(
-                    top: 0, left: 0, right: 0,
-                    child: Container(
-                      height: 44,
-                      color: Colors.black.withValues(alpha: 0.15),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('9:41', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                          Icon(Icons.signal_cellular_4_bar, color: Colors.white, size: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const _AuthHeader(
+              title: 'Welcome Back',
+              subtitle: 'Sign in to keep your family space moving.',
+              icon: Icons.home_rounded,
             ),
 
             // ── White card body ──────────────────────────────────────────
             Container(
-              color: Colors.white,
+              margin: const EdgeInsets.fromLTRB(16, 18, 16, 28),
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.g200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -120,16 +116,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Login button
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Get.offAllNamed(AppRoutes.home),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
+                    child: Obx(
+                      () => ElevatedButton(
+                        onPressed: _authProvider.isLoading.value ? null : _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.blue,
+                          disabledBackgroundColor: AppColors.blue.withValues(alpha: 0.5),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        child: _authProvider.isLoading.value
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text(
+                                'Login',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
                       ),
-                      child: const Text('Login', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -143,10 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const TextSpan(text: 'Add or Join a your family? '),
                           WidgetSpan(
                             child: GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const SignupScreen()),
-                              ),
+                              onTap: () => Get.toNamed(AppRoutes.signup),
                               child: const Text(
                                 'Register now',
                                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.blue, fontFamily: 'Araboto'),
@@ -207,7 +212,63 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
+      ),
     );
+  }
+
+  Future<void> _login() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passCtrl.text;
+
+    final validationMessage = _validateLogin(email: email, password: password);
+    if (validationMessage != null) {
+      Get.snackbar('Check your details', validationMessage);
+      return;
+    }
+
+    try {
+      final user = await _authProvider.login(email: email, password: password);
+      final role = (user.role ?? 'user').toLowerCase();
+      if (role == 'admin') {
+        Get.snackbar('Unsupported account', 'Admin accounts should use the admin flow.');
+        return;
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      Get.offAllNamed(AppRoutes.home);
+    } catch (error) {
+      Get.snackbar(
+        'Login failed',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  String? _validateLogin({
+    required String email,
+    required String password,
+  }) {
+    if (email.isEmpty || password.isEmpty) {
+      return 'Please enter your email and password.';
+    }
+
+    if (!_isValidEmail(email) || email.length < 7 || email.length > 40) {
+      return 'Email must be valid and between 7 and 40 characters.';
+    }
+
+    if (password.length < 6 || password.length > 20) {
+      return 'Password must be between 6 and 20 characters.';
+    }
+
+    return null;
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
   }
 
   Widget _buildField({
@@ -247,6 +308,64 @@ class _LoginScreenState extends State<LoginScreen> {
         height: 48,
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         child: Center(child: child),
+      ),
+    );
+  }
+}
+
+class _AuthHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+
+  const _AuthHeader({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 22),
+      decoration: BoxDecoration(
+        color: AppColors.dashboardPurple,
+        borderRadius: BorderRadius.circular(26),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: Icon(icon, color: AppColors.blue, size: 21),
+              ),
+              const Spacer(),
+              const Icon(Icons.family_restroom_rounded, color: Colors.white, size: 22),
+            ],
+          ),
+          const SizedBox(height: 28),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w900, color: Colors.white),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.74), fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

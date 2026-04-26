@@ -4,6 +4,8 @@ import 'dart:async';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../services/splash_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,6 +15,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final SplashService _splashService = SplashService();
+
   @override
   void initState() {
     super.initState();
@@ -21,7 +25,29 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(milliseconds: 1600));
-    Get.offAllNamed(AppRoutes.onboarding);
+    final isLoggedIn = await _splashService.checkAuthentication();
+    final onboardingCompleted = await _splashService.isOnboardingCompleted();
+
+    if (!mounted) {
+      return;
+    }
+
+    if (isLoggedIn) {
+      final authProvider = Get.isRegistered<AuthProvider>()
+          ? Get.find<AuthProvider>()
+          : Get.put(AuthProvider(), permanent: true);
+      await authProvider.restoreSession();
+
+      if (!mounted) {
+        return;
+      }
+
+      Get.offAllNamed(AppRoutes.home);
+    } else if (onboardingCompleted) {
+      Get.offAllNamed(AppRoutes.login);
+    } else {
+      Get.offAllNamed(AppRoutes.onboarding);
+    }
   }
 
   @override

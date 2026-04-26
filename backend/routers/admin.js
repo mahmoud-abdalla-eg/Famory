@@ -31,10 +31,8 @@ const upload = multer({
      })
 
 
-
-// upload.single('image')
-
-adminRouters.post("", upload.single('image'), validationMW.admin, adminController.insert);
+// Parse multipart form-data fields for create requests sent from Postman form-data.
+adminRouters.post("", upload.none(), validationMW.admin, adminController.insert);
 adminRouters.get("", adminController.select);
 adminRouters.delete("/:id", authMW, adminController.deleteAdmin);
 adminRouters.patch("/:id", authMW, adminController.recover);

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
+  static const Color dashboardPurple = Color(0xFF6E40E7);
+  static const Color dashboardPurpleD = Color(0xFF5630C8);
+
   static const Color blue = Color(0xFF3B82F6);
   static const Color blueD = Color(0xFF2563EB);
   static const Color blueL = Color(0xFFEFF6FF);
