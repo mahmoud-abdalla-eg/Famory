@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/services/family_service.dart';
 
 class CreateFamilyRoleScreen extends StatefulWidget {
@@ -14,48 +15,73 @@ class CreateFamilyRoleScreen extends StatefulWidget {
 class _CreateFamilyRoleScreenState extends State<CreateFamilyRoleScreen> {
   String _role = 'Parent';
 
-  void _continue() {
+  Future<void> _continue() async {
     final args = (Get.arguments as Map?) ?? {};
     final familyName = (args['familyName'] as String?) ?? 'The Famory Family';
     final homeCity = (args['homeCity'] as String?) ?? '';
     final motto = (args['motto'] as String?) ?? '';
 
-    FamilyService().createFamily(
-      name: familyName,
-      owner: 'You',
-      role: _role,
-    );
-    Get.toNamed(
-      AppRoutes.familyInvite,
-      arguments: {
-        'familyName': familyName,
-        'homeCity': homeCity,
-        'motto': motto,
-        'role': _role,
-      },
-    );
+    try {
+      await FamilyService().createFamily(
+        name: familyName,
+        owner: _currentUserName(),
+        role: _role,
+      );
+      Get.toNamed(
+        AppRoutes.familyInvite,
+        arguments: {
+          'familyName': familyName,
+          'homeCity': homeCity,
+          'motto': motto,
+          'role': _role,
+        },
+      );
+    } catch (error) {
+      Get.snackbar(
+        'Create family failed',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
-  void _skipStep() {
+  Future<void> _skipStep() async {
     final args = (Get.arguments as Map?) ?? {};
     final familyName = (args['familyName'] as String?) ?? 'The Famory Family';
     final homeCity = (args['homeCity'] as String?) ?? '';
     final motto = (args['motto'] as String?) ?? '';
 
-    FamilyService().createFamily(
-      name: familyName,
-      owner: 'You',
-      role: 'Parent',
-    );
-    Get.toNamed(
-      AppRoutes.familyInvite,
-      arguments: {
-        'familyName': familyName,
-        'homeCity': homeCity,
-        'motto': motto,
-        'role': 'Parent',
-      },
-    );
+    try {
+      await FamilyService().createFamily(
+        name: familyName,
+        owner: _currentUserName(),
+        role: 'Parent',
+      );
+      Get.toNamed(
+        AppRoutes.familyInvite,
+        arguments: {
+          'familyName': familyName,
+          'homeCity': homeCity,
+          'motto': motto,
+          'role': 'Parent',
+        },
+      );
+    } catch (error) {
+      Get.snackbar(
+        'Create family failed',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'You';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'You' : name;
   }
 
   @override
@@ -154,7 +180,7 @@ class _Header extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF6E4BFF), Color(0xFF3E36D1)],
+          colors: [AppColors.dashboardPurple, AppColors.dashboardPurpleD],
         ),
         borderRadius: BorderRadius.circular(28),
       ),

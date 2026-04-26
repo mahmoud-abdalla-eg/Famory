@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../settings/settings_detail_screens.dart';
 
 class EmptyDashboardScreen extends StatelessWidget {
-  const EmptyDashboardScreen({super.key});
+  final Function(String) onNavigate;
+
+  const EmptyDashboardScreen({super.key, required this.onNavigate});
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +18,12 @@ class EmptyDashboardScreen extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const _Header(
-                name: 'Name',
+              _Header(
+                name: _currentUserName(),
                 subtitle: 'Welcome! Let\'s get your family setup.',
-                avatarInitial: 'N',
                 showAdd: true,
+                onSettingsTap: () => onNavigate('settings'),
+                onProfileTap: () => Get.to(() => const ProfileSettingsScreen()),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
@@ -81,19 +86,30 @@ class EmptyDashboardScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'Name';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'Name' : name;
+  }
 }
 
 class _Header extends StatelessWidget {
   final String name;
   final String subtitle;
-  final String avatarInitial;
   final bool showAdd;
+  final VoidCallback onSettingsTap;
+  final VoidCallback onProfileTap;
 
   const _Header({
     required this.name,
     required this.subtitle,
-    required this.avatarInitial,
     required this.showAdd,
+    required this.onSettingsTap,
+    required this.onProfileTap,
   });
 
   @override
@@ -102,7 +118,7 @@ class _Header extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: BoxDecoration(
-        color: const Color(0xFF6E40E7),
+        color: AppColors.dashboardPurple,
         borderRadius: BorderRadius.circular(26),
       ),
       child: Column(
@@ -110,9 +126,9 @@ class _Header extends StatelessWidget {
         children: [
           Row(
             children: [
-              _Avatar(avatarInitial: avatarInitial),
+              ProfileAvatarButton(name: name, onTap: onProfileTap),
               const Spacer(),
-              const _TopIcon(icon: Icons.settings_rounded),
+              _TopIcon(icon: Icons.settings_rounded, onTap: onSettingsTap),
               if (showAdd) ...[
                 const SizedBox(width: 8),
                 const _TopIcon(icon: Icons.add_circle_outline_rounded),
@@ -124,7 +140,7 @@ class _Header extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Good Morning {$name}',
+                  'Good Morning $name',
                   style: const TextStyle(
                     fontSize: 23,
                     fontWeight: FontWeight.w800,
@@ -149,41 +165,23 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _Avatar extends StatelessWidget {
-  final String avatarInitial;
-
-  const _Avatar({required this.avatarInitial});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Text(
-          avatarInitial,
-          style: const TextStyle(
-            color: Color(0xFF91B9FF),
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _TopIcon extends StatelessWidget {
   final IconData icon;
+  final VoidCallback? onTap;
 
-  const _TopIcon({required this.icon});
+  const _TopIcon({required this.icon, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Icon(icon, color: Colors.white, size: 22);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 32,
+        height: 32,
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
+    );
   }
 }
 
@@ -260,7 +258,7 @@ class _ActionCard extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onTap,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0D6EFD),
+                        backgroundColor: AppColors.blue,
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.zero,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

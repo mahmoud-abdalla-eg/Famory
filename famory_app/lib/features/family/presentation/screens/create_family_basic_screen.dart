@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 class CreateFamilyBasicScreen extends StatefulWidget {
   const CreateFamilyBasicScreen({super.key});
@@ -13,23 +14,29 @@ class CreateFamilyBasicScreen extends StatefulWidget {
 class _CreateFamilyBasicScreenState extends State<CreateFamilyBasicScreen> {
   final _nameCtrl = TextEditingController();
   final _sloganCtrl = TextEditingController();
-  final _roleCtrl = TextEditingController();
   final _specialCtrl = TextEditingController();
 
   @override
   void dispose() {
     _nameCtrl.dispose();
     _sloganCtrl.dispose();
-    _roleCtrl.dispose();
     _specialCtrl.dispose();
     super.dispose();
   }
 
   void _continue() {
+    final familyName = _nameCtrl.text.trim();
+    if (familyName.length < 3 || familyName.length > 50) {
+      Get.snackbar('Check family name', 'Family name must be between 3 and 50 characters.');
+      return;
+    }
+
     Get.toNamed(
-      AppRoutes.familyInvite,
+      AppRoutes.familyCreateRole,
       arguments: {
-        'familyName': _nameCtrl.text.trim().isEmpty ? 'Chen Family' : _nameCtrl.text.trim(),
+        'familyName': familyName,
+        'motto': _sloganCtrl.text.trim(),
+        'specialDate': _specialCtrl.text.trim(),
       },
     );
   }
@@ -77,13 +84,6 @@ class _CreateFamilyBasicScreenState extends State<CreateFamilyBasicScreen> {
                     ),
                     const SizedBox(height: 12),
                     _InputCard(
-                      icon: Icons.extension_rounded,
-                      title: 'Your role in Family (optional)',
-                      controller: _roleCtrl,
-                      hint: 'Ex: Tech Support',
-                    ),
-                    const SizedBox(height: 12),
-                    _InputCard(
                       icon: Icons.event_rounded,
                       title: 'Special Date (optional)',
                       controller: _specialCtrl,
@@ -121,11 +121,13 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = _currentUserName();
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: const BoxDecoration(
-        color: Color(0xFF6E40E7),
+        color: AppColors.dashboardPurple,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -133,9 +135,9 @@ class _Header extends StatelessWidget {
           topRight: Radius.circular(24),
         ),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Row(
+          const Row(
             children: [
               _Avatar(),
               Spacer(),
@@ -144,11 +146,20 @@ class _Header extends StatelessWidget {
               _TopIcon(icon: Icons.add_circle_outline_rounded),
             ],
           ),
-          SizedBox(height: 30),
-          Text('Good Morning {Name}', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 30),
+          Text('Good Morning $displayName', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         ],
       ),
     );
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'Name';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'Name' : name;
   }
 }
 
