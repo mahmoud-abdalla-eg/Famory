@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/calendar_event.dart';
+import '../../data/services/event_service.dart';
 
 /// Bottom sheet shown when the user taps "+ Event" on the Calendar screen.
 /// Calls [onEventAdded] with the new [CalendarEventModel] when confirmed.
 class CreateEventScreen extends StatefulWidget {
-  final void Function(CalendarEventModel event) onEventAdded;
+  final DateTime selectedDate;
+  final EventService? eventService;
 
-  const CreateEventScreen({super.key, required this.onEventAdded});
+  const CreateEventScreen({
+    super.key,
+    required this.selectedDate,
+    this.eventService,
+  });
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -23,9 +28,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     AppColors.blue, AppColors.green, AppColors.orange, AppColors.purple, AppColors.teal,
   ];
 
+  late final EventService _eventService;
+
   @override
   void initState() {
     super.initState();
+    _eventService = widget.eventService ?? EventService();
     _timeCtrl.text = '9:00 AM';
   }
 
@@ -40,13 +48,22 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final title = _titleCtrl.text.trim();
     if (title.isEmpty) { Navigator.pop(context); return; }
 
-    // Pick a color based on how many events already exist (caller increments)
-    widget.onEventAdded(
+    final time = _timeCtrl.text.trim().isNotEmpty ? _timeCtrl.text.trim() : '12:00 PM'; 
+      // Requires refinement on input validation, this is not enough
+
+    _eventService.addEvent(
       CalendarEventModel(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
         title: title,
-        time:  _timeCtrl.text.isNotEmpty ? _timeCtrl.text : '12:00 PM',
-        who:   _who,
-        color: _eventColors[0], // caller can override index if needed
+        date: DateTime(
+          widget.selectedDate.year,
+          widget.selectedDate.month,
+          widget.selectedDate.day,
+        ),
+        time: time,
+        startTime: time,
+        who: _who,
+        color: _eventColors[0], // use a default color since there's no color picker yet
       ),
     );
     Navigator.pop(context);

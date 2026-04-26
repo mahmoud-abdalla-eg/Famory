@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../data/models/calendar_event.dart';
+import '../../data/services/event_service.dart';
 import 'create_event_screen.dart';
 import '../widgets/event_row_widget.dart';
 
@@ -20,7 +20,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   late int _calMonth; // 0-based
   late int _selDay;
 
-  late Map<String, List<CalendarEventModel>> _events;
+  final EventService _eventService = EventService();
 
   static const _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -28,9 +28,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   ];
   static const _dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   static const _dayAbbr  = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-  static const _eventColors = [
-    AppColors.blue, AppColors.green, AppColors.orange, AppColors.purple, AppColors.teal,
-  ];
 
   @override
   void initState() {
@@ -40,29 +37,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _calMonth = now.month - 1;
     _selDay   = now.day;
 
-    _events = {
-      _key(now.year, now.month - 1, now.day): [
-        const CalendarEventModel(title: 'Doctor appointment',  time: '9:00 AM',  who: 'Sarah',       color: AppColors.blue),
-        const CalendarEventModel(title: 'School pickup',       time: '3:00 PM',  who: 'James',       color: AppColors.green),
-        const CalendarEventModel(title: 'Family dinner',       time: '6:30 PM',  who: 'All Members', color: AppColors.orange),
-      ],
-      _key(now.year, now.month - 1, now.day + 3): [
-        const CalendarEventModel(title: 'Emma soccer practice', time: '4:00 PM', who: 'Emma',        color: AppColors.orange),
-      ],
-      _key(now.year, now.month - 1, now.day + 7): [
-        const CalendarEventModel(title: 'Family movie night',   time: '7:00 PM', who: 'All Members', color: AppColors.purple),
-      ],
-      _key(now.year, now.month - 1, now.day + 14): [
-        const CalendarEventModel(title: 'Liam birthday party',  time: '2:00 PM', who: 'All Members', color: AppColors.red),
-      ],
-    };
+    _eventService.initializeSampleEvents();
+    _eventService.addListener(_handleEventsChanged);
+  }
+
+  @override
+  void dispose() {
+    _eventService.removeListener(_handleEventsChanged);
+    super.dispose();
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
-  static String _key(int y, int m, int d) => '$y-$m-$d';
+  void _handleEventsChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   List<CalendarEventModel> get _selectedEvents =>
-      _events[_key(_calYear, _calMonth, _selDay)] ?? [];
+      _eventService.getEventsForDate(DateTime(_calYear, _calMonth + 1, _selDay));
 
   void _changeMonth(int dir) {
     setState(() {
@@ -83,20 +75,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => CreateEventScreen(
-        onEventAdded: (ev) {
-          final key = _key(_calYear, _calMonth, _selDay);
-          setState(() {
-            if (!_events.containsKey(key)) _events[key] = [];
-            final idx = _events[key]!.length;
-            // Pick rotating color based on event count
-            _events[key]!.add(CalendarEventModel(
-              title: ev.title,
-              time:  ev.time ?? '12:00 PM',
-              who:   ev.who ?? 'All Members',
-              color: _eventColors[idx % _eventColors.length],
-            ));
-          });
-        },
+        selectedDate: DateTime(_calYear, _calMonth + 1, _selDay),
+        eventService: _eventService,
       ),
     );
   }
@@ -234,7 +214,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
             itemBuilder: (_, index) {
               if (index < firstWeekday) return const SizedBox();
               final day = index - firstWeekday + 1;
-              final hasEvent = (_events[_key(_calYear, _calMonth, day)] ?? []).isNotEmpty;
+              final hasEvent = _eventService.hasEventsOnDate(
+                DateTime(_calYear, _calMonth + 1, day),
+              );
               final isToday    = now.year == _calYear && now.month - 1 == _calMonth && now.day == day;
               final isSelected = _selDay == day && !isToday;
 
@@ -296,7 +278,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
         padding: const EdgeInsets.symmetric(vertical: 20),
         alignment: Alignment.center,
         child: const Text(
-          'No events — tap + Event to add one',
+          'No events — tap + Add to create one', 
+            // Change of hint, since add event button is renamed
           style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.g400),
         ),
       );
