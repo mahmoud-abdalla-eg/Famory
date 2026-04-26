@@ -285,7 +285,21 @@ class _CalendarScreenState extends State<CalendarScreen> {
       );
     }
     return Column(
-      children: _selectedEvents.map((ev) => EventRowWidget(event: ev)).toList(),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ..._selectedEvents
+            .map((ev) => EventRowWidget(event: ev, eventService: _eventService)),
+        const SizedBox(height: 12),
+        const Text(
+          'Swipe right to edit an event, or swipe left to delete it.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.g400,
+          ),
+        ),
+      ],
     );
   }
 }
