@@ -10,7 +10,7 @@ class JoinFamilyPreviewScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final args = (Get.arguments as Map?) ?? {};
     final familyName = (args['familyName'] as String?) ?? 'The Parker Family';
-    final familyCode = (args['familyCode'] as String?) ?? 'FAM-4821';
+    final familyCode = (args['familyCode'] as String?) ?? 'No code loaded';
 
     return Scaffold(
       backgroundColor: AppColors.g50,
@@ -142,7 +142,7 @@ class _Header extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF6E4BFF), Color(0xFF3E36D1)],
+          colors: [AppColors.dashboardPurple, AppColors.dashboardPurpleD],
         ),
         borderRadius: BorderRadius.circular(28),
       ),

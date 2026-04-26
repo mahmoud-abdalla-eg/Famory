@@ -18,6 +18,16 @@ class SplashService {
     }
   }
 
+  Future<bool> isOnboardingCompleted() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool('onboarding_completed') ?? false;
+    } catch (e) {
+      debugPrint('Error checking onboarding state: $e');
+      return false;
+    }
+  }
+
   /// Initialize app services
   Future<void> initializeServices() async {
     try {

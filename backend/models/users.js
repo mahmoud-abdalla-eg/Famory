@@ -1,4 +1,4 @@
-const { ObjectId, user } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const config = require("../db/config");
 
 const insert = async (user) => {
@@ -16,8 +16,9 @@ const findByEmail = async (email) => {
 
 const confirmEmail = async (userId) => {
   try {
-    const result = await db.collection('users').updateOne(
-      { _id: new Mongouser.ObjectId(userId), isVerified: false },
+    const usersCollection = await config.getCollection("users");
+    const result = await usersCollection.updateOne(
+      { _id: new ObjectId(userId), isVerified: false },
       { $set: { isVerified: true } }
     );
     return result.modifiedCount > 0;
@@ -84,9 +85,17 @@ const update = async (userId, user) => {
   const updateResult = await usersCollection.findOneAndUpdate(
     { _id: new ObjectId(userId) },
     { $set: user },
-    { returnOriginal: false } // Ensure you get the updated document
+    { returnDocument: "after", returnOriginal: false } // Ensure you get the updated document
   );
-  return updateResult;
+  if (updateResult && updateResult.value) {
+    return updateResult.value;
+  }
+
+  if (updateResult && updateResult._id) {
+    return updateResult;
+  }
+
+  return usersCollection.findOne({ _id: new ObjectId(userId) });
 };
 
 
@@ -117,5 +126,5 @@ module.exports = {
   update,
   getuserById,
   findByEmail,
-  // confirmEmail
+  confirmEmail,
 };

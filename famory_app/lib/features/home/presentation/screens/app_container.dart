@@ -7,6 +7,7 @@ import '../../../chat/presentation/screens/chat_home_screen.dart';
 import '../../../calendar/presentation/screens/calendar_screen.dart';
 import '../../../memories/presentation/screens/memories_screen.dart';
 import '../../../family/data/services/family_service.dart';
+import '../../../settings/settings_screen.dart';
 
 class AppContainer extends StatefulWidget {
   final void Function(String languageCode) onChangeLanguage;
@@ -24,8 +25,21 @@ class AppContainer extends StatefulWidget {
 
 class _AppContainerState extends State<AppContainer> {
   String currentScreen = 'home';
+  static const Set<String> _familyOnlyScreens = {
+    'chat',
+    'tasks',
+    'calendar',
+    'photos',
+  };
 
   void navigateTo(String screen) {
+    if (_familyOnlyScreens.contains(screen) && !FamilyService().hasFamily) {
+      setState(() {
+        currentScreen = 'home';
+      });
+      return;
+    }
+
     setState(() {
       currentScreen = screen;
     });
@@ -36,7 +50,7 @@ class _AppContainerState extends State<AppContainer> {
       case 'home':
         return FamilyService().hasFamily
             ? FamilyDashboardScreen(onNavigate: navigateTo)
-            : const EmptyDashboardScreen();
+            : EmptyDashboardScreen(onNavigate: navigateTo);
       case 'chat':
         return const ChatHomeScreen();
       case 'tasks':
@@ -45,15 +59,23 @@ class _AppContainerState extends State<AppContainer> {
         return const CalendarScreen();
       case 'photos':
         return const MemoriesScreen();
+      case 'settings':
+        return SettingsScreen(
+          onBack: () => navigateTo('home'),
+          onChangeLanguage: widget.onChangeLanguage,
+          currentLocale: widget.currentLocale,
+        );
       default:
         return FamilyService().hasFamily
             ? FamilyDashboardScreen(onNavigate: navigateTo)
-            : const EmptyDashboardScreen();
+            : EmptyDashboardScreen(onNavigate: navigateTo);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final hasFamily = FamilyService().hasFamily;
+
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 200),
@@ -62,10 +84,12 @@ class _AppContainerState extends State<AppContainer> {
           child: renderScreen(),
         ),
       ),
-      bottomNavigationBar: BottomNav(
-        activeTab: currentScreen,
-        onTabChange: navigateTo,
-      ),
+      bottomNavigationBar: currentScreen == 'settings' || !hasFamily
+          ? null
+          : BottomNav(
+              activeTab: currentScreen,
+              onTabChange: navigateTo,
+            ),
     );
   }
 }

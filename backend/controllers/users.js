@@ -1,38 +1,48 @@
 const usersModel = require("../models/users");
 // const joi = require("joi");
 const bcrypt = require("bcrypt");
-const crypto = require('crypto');
 
 const jwt = require("jsonwebtoken");
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 // 1- login => return token
 // 2- any new request =>check token
 
 
 const insert = async (request, response) => {
-  const user = request.body;
+  // Check if the request body exists and contains the email property
+  if (!request.body || !request.body.email) {
+    return response.status(400).json({
+      status: "error",
+      msg: "Send name, email, and password in the request body, not in headers",
+    });
+  }
 
-  // Validate user data
-  if (!user.email || !user.password) {
-    return response.status(400).json({ status: "error", msg: "Missing email or password" });
+  const user = request.body;
+  if (request.file) {
+    user.profilePhoto = `/uploads/${request.file.filename}`;
+    user.avatarUrl = user.profilePhoto;
   }
 
   // Check for duplicate email
-  try {
-    const existinguser = await usersModel.findByEmail(user.email);
-    if (existinguser) {
-      return response.status(409).json({ status: "error", msg: "Duplicated Email" });
-    }
+  const selecteduser = await usersModel.selectOne(user.email);
 
-    // Hash password
+  if (selecteduser === null) {
+    // Hashing the password
+    const password = user.password;
     const salt = bcrypt.genSaltSync(10);
-    user.password = bcrypt.hashSync(user.password, salt);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    user.password = hashedPassword;
     user.isDeleted = false;
 
-    // Insert user
+    // Insert the user into the database
     const insertResult = await usersModel.insert(user);
-    response.status(201).json({ insertedId: insertResult.insertedId });
-  } catch (error) {
-    response.status(500).json({ status: "error", msg: error.message });
+    return response.status(201).json(insertResult);
+  } else {
+    return response.status(409).json({
+      status: "error",
+      msg: "Duplicated Email",
+    });
   }
 };
 
@@ -136,6 +146,10 @@ const recover = async (request, response) => {
 const update = async (request, response) => {
   const userid = request.params.id;
   const user = request.body;
+  if (request.file) {
+    user.profilePhoto = `/uploads/${request.file.filename}`;
+    user.avatarUrl = user.profilePhoto;
+  }
 
   try {
     const updateResulte = await usersModel.update(userid, user);
@@ -143,7 +157,9 @@ const update = async (request, response) => {
     console.log(user); // Debugging
     console.log(updateResulte); // Debugging
 
-    if (!updateResulte.value) { // Adjust condition based on MongoDB result
+    const updatedUser = updateResulte;
+
+    if (!updatedUser) { // Adjust condition based on MongoDB result
       return response.status(404).json({
         status: "error",
         msg: `${userid} does not exist`,
@@ -152,6 +168,7 @@ const update = async (request, response) => {
       return response.status(200).json({
         status: "ok",
         msg: `${userid} updated`,
+        user: updatedUser,
       });
     }
   } catch (error) {
@@ -163,9 +180,6 @@ const update = async (request, response) => {
   }
 };
 
-
-const generateSecretKey = () => crypto.randomBytes(64).toString('hex');
-const JWT_SECRET = generateSecretKey(); // Replace with your generated key
 
 const login = async (req, res) => {
   try {
