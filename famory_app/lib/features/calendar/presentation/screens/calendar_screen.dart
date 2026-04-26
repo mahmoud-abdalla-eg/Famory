@@ -20,7 +20,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   late int _calMonth; // 0-based
   late int _selDay;
 
-  late Map<String, List<CalendarEvent>> _events;
+  late Map<String, List<CalendarEventModel>> _events;
 
   static const _months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -42,18 +42,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     _events = {
       _key(now.year, now.month - 1, now.day): [
-        const CalendarEvent(title: 'Doctor appointment',  time: '9:00 AM',  who: 'Sarah',       color: AppColors.blue),
-        const CalendarEvent(title: 'School pickup',       time: '3:00 PM',  who: 'James',       color: AppColors.green),
-        const CalendarEvent(title: 'Family dinner',       time: '6:30 PM',  who: 'All Members', color: AppColors.orange),
+        const CalendarEventModel(title: 'Doctor appointment',  time: '9:00 AM',  who: 'Sarah',       color: AppColors.blue),
+        const CalendarEventModel(title: 'School pickup',       time: '3:00 PM',  who: 'James',       color: AppColors.green),
+        const CalendarEventModel(title: 'Family dinner',       time: '6:30 PM',  who: 'All Members', color: AppColors.orange),
       ],
       _key(now.year, now.month - 1, now.day + 3): [
-        const CalendarEvent(title: 'Emma soccer practice', time: '4:00 PM', who: 'Emma',        color: AppColors.orange),
+        const CalendarEventModel(title: 'Emma soccer practice', time: '4:00 PM', who: 'Emma',        color: AppColors.orange),
       ],
       _key(now.year, now.month - 1, now.day + 7): [
-        const CalendarEvent(title: 'Family movie night',   time: '7:00 PM', who: 'All Members', color: AppColors.purple),
+        const CalendarEventModel(title: 'Family movie night',   time: '7:00 PM', who: 'All Members', color: AppColors.purple),
       ],
       _key(now.year, now.month - 1, now.day + 14): [
-        const CalendarEvent(title: 'Liam birthday party',  time: '2:00 PM', who: 'All Members', color: AppColors.red),
+        const CalendarEventModel(title: 'Liam birthday party',  time: '2:00 PM', who: 'All Members', color: AppColors.red),
       ],
     };
   }
@@ -61,7 +61,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // ── Helpers ─────────────────────────────────────────────────────────────────
   static String _key(int y, int m, int d) => '$y-$m-$d';
 
-  List<CalendarEvent> get _selectedEvents =>
+  List<CalendarEventModel> get _selectedEvents =>
       _events[_key(_calYear, _calMonth, _selDay)] ?? [];
 
   void _changeMonth(int dir) {
@@ -89,7 +89,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             if (!_events.containsKey(key)) _events[key] = [];
             final idx = _events[key]!.length;
             // Pick rotating color based on event count
-            _events[key]!.add(CalendarEvent(
+            _events[key]!.add(CalendarEventModel(
               title: ev.title,
               time:  ev.time ?? '12:00 PM',
               who:   ev.who ?? 'All Members',

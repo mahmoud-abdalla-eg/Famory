@@ -4,7 +4,7 @@ import '../../data/models/calendar_event.dart';
 
 /// A single event row showing time, color bar, title, and who.
 class EventRowWidget extends StatelessWidget {
-  final CalendarEvent event;
+  final CalendarEventModel event;
 
   const EventRowWidget({super.key, required this.event});
 
