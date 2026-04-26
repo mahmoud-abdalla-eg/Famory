@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../data/services/family_service.dart';
 
 class JoinFamilyOptionsScreen extends StatefulWidget {
   const JoinFamilyOptionsScreen({super.key});
@@ -12,6 +14,7 @@ class JoinFamilyOptionsScreen extends StatefulWidget {
 
 class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
   final _codeCtrl = TextEditingController();
+  bool _isChecking = false;
 
   @override
   void dispose() {
@@ -19,13 +22,53 @@ class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
     super.dispose();
   }
 
-  void _openSetup() {
-    Get.toNamed(
-      AppRoutes.familyJoinSetup,
-      arguments: {
-        'familyName': 'Parker Family',
-      },
-    );
+  Future<void> _openSetup({String? inviteCode}) async {
+    final code = (inviteCode ?? _codeCtrl.text).trim().toUpperCase();
+    if (code.length < 4 || code.length > 32) {
+      Get.snackbar('Invalid code', 'Enter a family invite code between 4 and 32 characters.');
+      return;
+    }
+
+    setState(() => _isChecking = true);
+    try {
+      await FamilyService().joinFamily(
+        inviteCode: code,
+        memberName: _currentUserName(),
+        role: 'Member',
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      Get.toNamed(
+        AppRoutes.familyJoinSetup,
+        arguments: {
+          'familyName': FamilyService().familyName ?? 'Family invite',
+          'inviteCode': code,
+          'alreadyJoined': true,
+        },
+      );
+    } catch (error) {
+      Get.snackbar(
+        'Invalid family code',
+        error.toString().replaceFirst('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isChecking = false);
+      }
+    }
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'You';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'You' : name;
   }
 
   @override
@@ -58,8 +101,12 @@ class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
                       iconBg: const Color(0xFFFFE6D5),
                       title: 'Scan QR Code',
                       subtitle: 'Scan the QR code with your camera',
-                      buttonLabel: 'Scan',
-                      onTap: _openSetup,
+                      buttonLabel: _isChecking ? 'Checking' : 'Scan',
+                      onTap: _isChecking
+                          ? null
+                          : () {
+                              _openSetup(inviteCode: _codeCtrl.text.trim());
+                            },
                     ),
                     const SizedBox(height: 12),
                     _JoinCard(
@@ -68,8 +115,12 @@ class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
                       iconBg: const Color(0xFFEAF6FC),
                       title: 'Scan from Gallery',
                       subtitle: 'Scan the QR code from your gallery',
-                      buttonLabel: 'Open',
-                      onTap: _openSetup,
+                      buttonLabel: _isChecking ? 'Checking' : 'Open',
+                      onTap: _isChecking
+                          ? null
+                          : () {
+                              _openSetup(inviteCode: _codeCtrl.text.trim());
+                            },
                     ),
                     const SizedBox(height: 12),
                     _JoinCard(
@@ -94,7 +145,11 @@ class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
                               width: 54,
                               height: 34,
                               child: ElevatedButton(
-                                onPressed: _openSetup,
+                                onPressed: _isChecking
+                                    ? null
+                                    : () {
+                                        _openSetup();
+                                      },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.blue,
                                   foregroundColor: Colors.white,
@@ -102,13 +157,23 @@ class _JoinFamilyOptionsScreenState extends State<JoinFamilyOptionsScreen> {
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   elevation: 0,
                                 ),
-                                child: const Text('Enter', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                                child: _isChecking
+                                    ? const SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                      )
+                                    : const Text('Enter', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      onTap: _openSetup,
+                      onTap: _isChecking
+                          ? null
+                          : () {
+                              _openSetup();
+                            },
                     ),
                   ],
                 ),
@@ -126,11 +191,13 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = _currentUserName();
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: const BoxDecoration(
-        color: Color(0xFF6E40E7),
+        color: AppColors.dashboardPurple,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -138,9 +205,9 @@ class _Header extends StatelessWidget {
           topRight: Radius.circular(24),
         ),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Row(
+          const Row(
             children: [
               _Avatar(),
               Spacer(),
@@ -149,11 +216,20 @@ class _Header extends StatelessWidget {
               _TopIcon(icon: Icons.add_circle_outline_rounded),
             ],
           ),
-          SizedBox(height: 30),
-          Text('Good Morning {Name}', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 30),
+          Text('Good Morning $displayName', style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w800, color: Colors.white)),
         ],
       ),
     );
+  }
+
+  String _currentUserName() {
+    if (!Get.isRegistered<AuthProvider>()) {
+      return 'Name';
+    }
+
+    final name = Get.find<AuthProvider>().currentUser.value?.name.trim();
+    return name == null || name.isEmpty ? 'Name' : name;
   }
 }
 
@@ -189,7 +265,7 @@ class _JoinCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final String buttonLabel;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final Widget? trailing;
 
   const _JoinCard({

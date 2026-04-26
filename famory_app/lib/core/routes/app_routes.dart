@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/splash/presentation/screens/splash_screen.dart';
 // import '../../features/onboarding/presentation/screens/welcome_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart'; // Using the existing one
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/home/presentation/screens/app_container.dart';
 import '../../features/family/presentation/screens/create_family_basic_screen.dart';
 import '../../features/family/presentation/screens/create_family_invite_screen.dart';
@@ -17,6 +19,7 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
+  static const String signup = '/signup';
   static const String home = '/home';
   static const String familyJoin = '/family-join';
   static const String familyJoinPreview = '/family-join-preview';
@@ -34,7 +37,10 @@ class AppRoutes {
     GetPage(
       name: onboarding,
       page: () => OnboardingScreen(
-        onComplete: () => Get.offAllNamed(login),
+        onComplete: () {
+          _markOnboardingComplete();
+          Get.offAllNamed(login);
+        },
       ),
     ),
     GetPage(
@@ -42,10 +48,14 @@ class AppRoutes {
       page: () => const LoginScreen(),
     ),
     GetPage(
+      name: signup,
+      page: () => const SignupScreen(),
+    ),
+    GetPage(
       name: home,
       page: () => AppContainer(
-        onChangeLanguage: (code) {},
-        currentLocale: const Locale('en'),
+        onChangeLanguage: (code) => Get.updateLocale(Locale(code)),
+        currentLocale: Get.locale ?? const Locale('en'),
       ), // Using existing AppContainer as base
     ),
     GetPage(
@@ -73,4 +83,9 @@ class AppRoutes {
       page: () => const CreateFamilyInviteScreen(),
     ),
   ];
+
+  static Future<void> _markOnboardingComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_completed', true);
+  }
 }

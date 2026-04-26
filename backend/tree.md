@@ -26,7 +26,6 @@ BACKEND/
 │   ├── task.js                           # Schema for tasks (title, description, assignee)
 │   └── users.js                          # Schema for users (name, email, password)
 │
-├── node_modules/                         # Node.js dependencies (installed via npm)
 │
 ├── routers/                              # API routing files to handle routes for each feature
 │   ├── adminRouter.js                    # Routes for admin-related actions (CRUD operations)

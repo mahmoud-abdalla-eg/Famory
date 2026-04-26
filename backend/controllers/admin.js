@@ -7,26 +7,29 @@ const jwt = require("jsonwebtoken");
 // 2- any new request =>check tokennpm install jsonwebtoken
 
 const insert = async (request, response) => {
-  // get data from body
-  const admin = request.body;
-  //   data validation in MW
+  // Check if the request body exists and contains the email property
+  if (!request.body || !request.body.email) {
+    return response.status(400).json({
+      status: "error",
+      msg: "Send name, email, and password in the request body, not in headers",
+    });
+  }
 
-  // check duplication
+  const admin = request.body;
+
+  // Check for duplicate email
   const selectedAdmin = await adminModel.selectOne(admin.email);
 
   if (selectedAdmin === null) {
-    // insert data
+    // Hashing the password
     const password = admin.password;
-
     const salt = bcrypt.genSaltSync(10);
-
     const hashedPassword = bcrypt.hashSync(password, salt);
-  
-    admin.password = hashedPassword;
-    // admin.image = request.file.filename;
 
+    admin.password = hashedPassword;
     admin.isDeleted = false;
 
+    // Insert the admin into the database
     const insertResult = await adminModel.insert(admin);
     return response.status(201).json(insertResult);
   } else {
