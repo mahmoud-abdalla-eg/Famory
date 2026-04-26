@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../data/models/calendar_event.dart';
 import 'create_event_screen.dart';
 import '../widgets/event_row_widget.dart';
@@ -12,6 +13,9 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
+
+  final theme = AppTheme.lightTheme;
+
   late int _calYear;
   late int _calMonth; // 0-based
   late int _selDay;
@@ -116,6 +120,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildCalendarHeader(),
+                  const SizedBox(height: 14),
                   _buildCalendarCard(now, firstWeekday, daysInMonth),
                   const SizedBox(height: 14),
                   _buildDayBar(selDateStr),
@@ -144,24 +150,51 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 children: [
                   Text('9:41', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
                 ],
-              ),
+              ), 
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${_months[_calMonth]} $_calYear',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-                  Row(
-                    children: [
-                      _NavBtn(icon: Icons.chevron_left,  onTap: () => _changeMonth(-1)),
-                      const SizedBox(width: 4),
-                      _NavBtn(icon: Icons.chevron_right, onTap: () => _changeMonth(1)),
-                    ],
+                  const Text('Events',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+                  GestureDetector(
+                    onTap: _showAddEvent,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text('+ Add', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white)),
+                    ),
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendarHeader() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("${_months[_calMonth]} $_calYear", 
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.g800)
+            ),
+            Row(
+              children: [
+                _NavBtn(icon: Icons.chevron_left,  onTap: () => _changeMonth(-1)),
+                const SizedBox(width: 4),
+                _NavBtn(icon: Icons.chevron_right, onTap: () => _changeMonth(1)),
+              ],
             ),
           ],
         ),
@@ -252,14 +285,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
           selDateStr.toUpperCase(),
           style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.g400, letterSpacing: 0.6),
         ),
-        GestureDetector(
-          onTap: _showAddEvent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(color: AppColors.blue, borderRadius: BorderRadius.circular(9)),
-            child: const Text('+ Event', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
-          ),
-        ),
       ],
     );
   }
@@ -295,7 +320,7 @@ class _NavBtn extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Icon(icon, color: Colors.white, size: 24),
+        child: Icon(icon, color: AppColors.blue, size: 24),
       ),
     );
   }
