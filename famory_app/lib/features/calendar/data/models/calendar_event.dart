@@ -21,12 +21,3 @@ class CalendarEventModel {
     required this.color,
   });
 }
-
-class CalendarEvent extends CalendarEventModel {
-  const CalendarEvent({
-    required super.title,
-    required super.time,
-    required super.who,
-    required super.color,
-  });
-}

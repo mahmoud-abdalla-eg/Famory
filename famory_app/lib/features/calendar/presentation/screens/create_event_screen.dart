@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/calendar_event.dart';
+import '../../data/services/event_service.dart';
 
 /// Bottom sheet shown when the user taps "+ Event" on the Calendar screen.
-/// Calls [onEventAdded] with the new [CalendarEvent] when confirmed.
+/// Calls [onEventAdded] with the new [CalendarEventModel] when confirmed.
 class CreateEventScreen extends StatefulWidget {
-  final void Function(CalendarEvent event) onEventAdded;
+  final DateTime selectedDate;
+  final EventService? eventService;
+  final CalendarEventModel? initialEvent;
 
-  const CreateEventScreen({super.key, required this.onEventAdded});
+  const CreateEventScreen({
+    super.key,
+    required this.selectedDate,
+    this.eventService,
+    this.initialEvent,
+  });
 
   @override
   State<CreateEventScreen> createState() => _CreateEventScreenState();
@@ -23,10 +31,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     AppColors.blue, AppColors.green, AppColors.orange, AppColors.purple, AppColors.teal,
   ];
 
+  late final EventService _eventService;
+  bool get _isEditing => widget.initialEvent != null;
+
   @override
   void initState() {
     super.initState();
-    _timeCtrl.text = '9:00 AM';
+    _eventService = widget.eventService ?? EventService();
+    _titleCtrl.text = widget.initialEvent?.title ?? '';
+    _timeCtrl.text = widget.initialEvent?.time ?? widget.initialEvent?.startTime ?? '9:00 AM';
+    _who = widget.initialEvent?.who ?? _who;
   }
 
   @override
@@ -40,16 +54,61 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final title = _titleCtrl.text.trim();
     if (title.isEmpty) { Navigator.pop(context); return; }
 
-    // Pick a color based on how many events already exist (caller increments)
-    widget.onEventAdded(
-      CalendarEvent(
-        title: title,
-        time:  _timeCtrl.text.isNotEmpty ? _timeCtrl.text : '12:00 PM',
-        who:   _who,
-        color: _eventColors[0], // caller can override index if needed
+    final time = _timeCtrl.text.trim().isNotEmpty ? _timeCtrl.text.trim() : '12:00 PM';
+    final previousEvent = widget.initialEvent;
+    final event = CalendarEventModel(
+      id: previousEvent?.id ?? DateTime.now().microsecondsSinceEpoch.toString(),
+      title: title,
+      date: DateTime(
+        widget.selectedDate.year,
+        widget.selectedDate.month,
+        widget.selectedDate.day,
       ),
+      time: time,
+      startTime: time,
+      endTime: previousEvent?.endTime,
+      who: _who,
+      color: previousEvent?.color ?? _eventColors[0],
     );
+
+    if (_isEditing) {
+      _eventService.updateEvent(event);
+    } else {
+      _eventService.addEvent(event);
+    }
     Navigator.pop(context);
+  }
+
+  void _delete() {
+    final eventId = widget.initialEvent?.id;
+    if (eventId == null) {
+      Navigator.pop(context);
+      return;
+    }
+    showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: Text('Delete "${widget.initialEvent?.title ?? _titleCtrl.text.trim()}"?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: TextButton.styleFrom(foregroundColor: AppColors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    ).then((confirmed) {
+      if (confirmed != true || !mounted) return;
+      _eventService.removeEvent(eventId);
+      Navigator.pop(context);
+    });
   }
 
   @override
@@ -63,9 +122,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'New Event',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.g900),
+          Text(
+            _isEditing ? 'Edit Event' : 'New Event',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.g900),
           ),
           const SizedBox(height: 14),
 
@@ -92,7 +151,24 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           // Cancel / Add Event
           Row(
             children: [
+              if (_isEditing) ...[
+                Expanded(
+                  flex: 1,
+                  child: GestureDetector(
+                    onTap: _delete,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(color: AppColors.red, borderRadius: BorderRadius.circular(12)),
+                      child: const Center(
+                        child: Text('Delete', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
               Expanded(
+                flex: 1,
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
@@ -106,13 +182,17 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               const SizedBox(width: 8),
               Expanded(
+                flex: _isEditing ? 2 : 1,
                 child: GestureDetector(
                   onTap: _submit,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(color: AppColors.blue, borderRadius: BorderRadius.circular(12)),
-                    child: const Center(
-                      child: Text('Add Event', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                    child: Center(
+                      child: Text(
+                        _isEditing ? 'Edit' : 'Add Event',
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
