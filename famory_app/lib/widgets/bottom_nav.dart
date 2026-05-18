@@ -30,54 +30,54 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, -6),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+      color: AppColors.g50,
       child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.g200),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.blue.withValues(alpha: 0.12),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: tabs.map((tab) {
               final isActive = activeTab == tab.id;
-              final color = isActive ? AppColors.blue : AppColors.g700;
+              final color = isActive ? AppColors.blue : AppColors.g400;
               return Expanded(
                 child: GestureDetector(
                   onTap: () => onTabChange(tab.id),
                   behavior: HitTestBehavior.opaque,
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    decoration: BoxDecoration(
+                      color: isActive ? AppColors.blueL : Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(tab.icon, size: 28, color: color),
-                        const SizedBox(height: 4),
+                        Icon(tab.icon, size: 23, color: color),
+                        const SizedBox(height: 3),
                         Text(
                           tab.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: color,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: isActive ? FontWeight.w900 : FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                          width: isActive ? 24 : 0,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: AppColors.blue,
-                            borderRadius: BorderRadius.circular(99),
                           ),
                         ),
                       ],

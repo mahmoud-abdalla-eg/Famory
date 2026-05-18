@@ -26,19 +26,46 @@ class EnvConfig {
     return value.isEmpty ? null : value;
   }
 
+  static String? get openAiApiKey {
+    final value = _read('OPENAI_API_KEY');
+    return value.isEmpty ? null : value;
+  }
+
+  static String? get deepSeekApiKey {
+    final value = _read('DEEPSEEK_API_KEY', fallback: openAiApiKey ?? '');
+    return value.isEmpty ? null : value;
+  }
+
+  static String get deepSeekBaseUrl {
+    return _read('DEEPSEEK_BASE_URL', fallback: 'https://api.deepseek.com');
+  }
+
+  static String get deepSeekModel {
+    return _read('DEEPSEEK_MODEL', fallback: 'deepseek-v4-flash');
+  }
+
   static String? authTokenFallback(String? savedToken) {
     final token = savedToken?.trim();
     if (token != null && token.isNotEmpty) {
       return token;
     }
 
-    return frontendAuthToken;
+    final fallbackToken = frontendAuthToken?.trim();
+    if (fallbackToken == null || fallbackToken.isEmpty || !_looksLikeJwt(fallbackToken)) {
+      return null;
+    }
+
+    return fallbackToken;
   }
 
   static String _read(String key, {String fallback = ''}) {
     const envValues = {
       'API_BASE_URL': String.fromEnvironment('API_BASE_URL'),
       'FRONTEND_AUTH_TOKEN': String.fromEnvironment('FRONTEND_AUTH_TOKEN'),
+      'DEEPSEEK_BASE_URL': String.fromEnvironment('DEEPSEEK_BASE_URL'),
+      'DEEPSEEK_API_KEY': String.fromEnvironment('DEEPSEEK_API_KEY'),
+      'DEEPSEEK_MODEL': String.fromEnvironment('DEEPSEEK_MODEL'),
+      'OPENAI_API_KEY': String.fromEnvironment('OPENAI_API_KEY'),
     };
 
     final dartDefineValue = envValues[key]?.trim();
@@ -90,5 +117,9 @@ class EnvConfig {
     }
 
     return value;
+  }
+
+  static bool _looksLikeJwt(String value) {
+    return value.split('.').length == 3;
   }
 }

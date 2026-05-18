@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
+import '../../../../core/auth/session_manager.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../services/splash_service.dart';
@@ -25,14 +25,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(milliseconds: 1600));
-    final isLoggedIn = await _splashService.checkAuthentication();
+    final sessionStatus = await _splashService.checkSessionStatus();
     final onboardingCompleted = await _splashService.isOnboardingCompleted();
 
     if (!mounted) {
       return;
     }
 
-    if (isLoggedIn) {
+    if (sessionStatus == SessionStatus.authenticated) {
       final authProvider = Get.isRegistered<AuthProvider>()
           ? Get.find<AuthProvider>()
           : Get.put(AuthProvider(), permanent: true);
@@ -43,6 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       Get.offAllNamed(AppRoutes.home);
+    } else if (sessionStatus == SessionStatus.expired) {
+      Get.offAllNamed(AppRoutes.sessionExpired);
     } else if (onboardingCompleted) {
       Get.offAllNamed(AppRoutes.login);
     } else {
@@ -59,28 +61,19 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 82,
-                height: 82,
-                decoration: BoxDecoration(
-                  color: AppColors.blue,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: const Center(
-                  child: Icon(Icons.home_rounded, color: Colors.white, size: 46),
-                ),
+              Image.asset(
+                'assets/images/Splash_logo.webp',
+                width: 150,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox(
+                    width: 150,
+                    height: 150,
+                  );
+                },
               ),
-              const SizedBox(height: 12),
-              Text(
-                'One Famory',
-                style: AppTextStyles.displayLarge.copyWith(fontSize: 28),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'One Place for Family Life',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.g400, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 28),
               const ThreeDotsLoader(),
             ],
           ),

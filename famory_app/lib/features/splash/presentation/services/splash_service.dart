@@ -1,20 +1,23 @@
 import 'package:flutter/foundation.dart'; // Add this for debugPrint
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/auth/session_manager.dart';
+
 class SplashService {
   SplashService();
 
   /// Check if user is authenticated
   Future<bool> checkAuthentication() async {
+    final status = await checkSessionStatus();
+    return status == SessionStatus.authenticated;
+  }
+
+  Future<SessionStatus> checkSessionStatus() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
-      
-      return isLoggedIn && token != null && token.isNotEmpty;
+      return await SessionManager.status();
     } catch (e) {
       debugPrint('Error checking authentication: $e'); // Now this will work
-      return false;
+      return SessionStatus.unauthenticated;
     }
   }
 

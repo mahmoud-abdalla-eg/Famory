@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
-class _Photo {
-  final String thumbUrl;
-  final String fullUrl;
-  final String caption;
-  _Photo({required this.thumbUrl, required this.fullUrl, required this.caption});
-}
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../data/models/album_model.dart';
+import '../../data/models/memory_model.dart';
+import '../../data/services/memory_service.dart';
 
 class MemoriesScreen extends StatefulWidget {
   const MemoriesScreen({super.key});
@@ -16,30 +17,199 @@ class MemoriesScreen extends StatefulWidget {
 }
 
 class _MemoriesScreenState extends State<MemoriesScreen> {
-  // Lightbox state
+  final MemoryService _memoryService = MemoryService();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  List<AlbumModel> _albums = [];
+  List<MemoryPhotoModel> _photos = [];
+  final Map<String, Uint8List> _photoBytes = {};
+
+  bool _isLoading = true;
+  bool _isSaving = false;
   bool _lightboxOpen = false;
-  String _lightboxUrl = '';
+  Uint8List? _lightboxBytes;
   String _lightboxCaption = '';
 
-  final List<_Photo> _recentPhotos = [
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191011?w=200&h=200&fit=crop&crop=faces', fullUrl: 'https://images.unsplash.com/photo-1511895426328-dc8714191011?w=600&h=600&fit=crop', caption: 'Family at the park'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=600&fit=crop', caption: 'Birthday celebration'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=600&fit=crop', caption: 'Summer vacation'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=600&h=600&fit=crop', caption: 'Autumn walk'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=600&h=600&fit=crop', caption: 'Home cooking'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=600&fit=crop', caption: 'Weekend fun'),
-  ];
+  List<MemoryPhotoModel> get _recentPhotos {
+    final photos = [..._photos];
+    photos.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return photos;
+  }
 
-  void _openLightbox(String url, String caption) {
+  List<String> get _photosWithoutAlbum {
+    return _photos
+        .where((photo) => photo.albumId == null || photo.albumId!.isEmpty)
+        .map((photo) => photo.id)
+        .toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLibrary();
+  }
+
+  Future<void> _loadLibrary() async {
+    setState(() => _isLoading = true);
+    final library = await _memoryService.loadLibrary();
+    final decrypted = <String, Uint8List>{};
+    for (final photo in library.photos) {
+      final bytes = await _memoryService.decryptPhoto(photo);
+      if (bytes != null) {
+        decrypted[photo.id] = bytes;
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     setState(() {
-      _lightboxUrl = url;
-      _lightboxCaption = caption;
+      _albums = library.albums;
+      _photos = library.photos;
+      _photoBytes
+        ..clear()
+        ..addAll(decrypted);
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _uploadPhotos() async {
+    try {
+      final picked = await _imagePicker.pickMultiImage(
+        imageQuality: 88,
+        maxWidth: 2200,
+      );
+      if (picked.isEmpty) {
+        return;
+      }
+
+      setState(() => _isSaving = true);
+      await _memoryService.addEncryptedPhotos(
+        picked.map((photo) => File(photo.path)).toList(),
+      );
+      await _loadLibrary();
+    } catch (error) {
+      _showSnack(_friendlyMessage(error));
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<void> _createAlbum() async {
+    final photoIds = _photosWithoutAlbum;
+    if (photoIds.isEmpty) {
+      _showSnack('Add new photos before creating another album.');
+      return;
+    }
+
+    final title = await _askAlbumTitle();
+    if (title == null) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      await _memoryService.createAlbum(title: title, photoIds: photoIds);
+      await _loadLibrary();
+    } catch (error) {
+      _showSnack(_friendlyMessage(error));
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+
+  Future<String?> _askAlbumTitle() async {
+    final controller = TextEditingController();
+    try {
+      return showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Create Album'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'Album name'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final title = controller.text.trim();
+                  Navigator.pop(context, title.isEmpty ? 'New Album' : title);
+                },
+                child: const Text('Create'),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      controller.dispose();
+    }
+  }
+
+  void _openLightbox(MemoryPhotoModel photo) {
+    final bytes = _photoBytes[photo.id];
+    if (bytes == null) {
+      _showSnack('Could not decrypt this photo.');
+      return;
+    }
+
+    setState(() {
+      _lightboxBytes = bytes;
+      _lightboxCaption = photo.originalName;
       _lightboxOpen = true;
     });
   }
 
   void _closeLightbox() {
-    setState(() => _lightboxOpen = false);
+    setState(() {
+      _lightboxOpen = false;
+      _lightboxBytes = null;
+      _lightboxCaption = '';
+    });
+  }
+
+  void _pushAlbumDetail(AlbumModel album) {
+    final photos = _photos.where((photo) => album.photoIds.contains(photo.id)).toList();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => _AlbumDetailScreen(
+          album: album,
+          photos: photos,
+          photoBytes: _photoBytes,
+        ),
+      ),
+    );
+  }
+
+  void _showSnack(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  String _friendlyMessage(Object error) {
+    final text = error.toString();
+    if (text.startsWith('Exception: ')) {
+      return text.replaceFirst('Exception: ', '');
+    }
+
+    return text;
   }
 
   @override
@@ -50,274 +220,327 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
         children: [
           Column(
             children: [
-              // Blue Header
-              Container(
-                color: AppColors.blue,
-                child: SafeArea(
-                  bottom: false,
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Row(
-                          children: [
-                            Text('9:41', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Album', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: const Text('🔒 AES-256', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Body
+              _Header(isSaving: _isSaving),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // On This Day featured image
-                      GestureDetector(
-                        onTap: () => _openLightbox(
-                          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop',
-                          '3 years ago today · Mountain trip',
-                        ),
-                        child: Container(
-                          height: 140,
-                          margin: const EdgeInsets.only(bottom: 14),
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Stack(
-                              children: [
-                                Image.network(
-                                  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=140&fit=crop&crop=center',
-                                  width: double.infinity,
-                                  height: 140,
-                                  fit: BoxFit.cover,
-                                ),
-                                Positioned.fill(
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.bottomCenter,
-                                        end: Alignment.topCenter,
-                                        colors: [Colors.black.withValues(alpha: 0.7), Colors.transparent],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const Positioned(
-                                  bottom: 14,
-                                  left: 14,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text('ON THIS DAY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white70)),
-                                      Text('3 years ago today', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Albums section
-                      const Text('ALBUMS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.g400, letterSpacing: 0.6)),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildAlbumCard(
-                              'Birthdays',
-                              '47 photos',
-                              'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=80&fit=crop&crop=center',
-                              () => _pushAlbumDetail(context, 'Birthdays', '47 photos', _birthdayPhotos),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _buildAlbumCard(
-                              'Vacations',
-                              '134 photos',
-                              'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=80&fit=crop&crop=center',
-                              () => _pushAlbumDetail(context, 'Vacations', '134 photos', _vacationPhotos),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      // Recent section
-                      const Text('RECENT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.g400, letterSpacing: 0.6)),
-                      const SizedBox(height: 8),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 3,
-                          crossAxisSpacing: 3,
-                        ),
-                        itemCount: _recentPhotos.length,
-                        itemBuilder: (ctx, i) {
-                          final p = _recentPhotos[i];
-                          return GestureDetector(
-                            onTap: () => _openLightbox(p.fullUrl, p.caption),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(p.thumbUrl, fit: BoxFit.cover),
-                            ),
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 14),
-
-                      // Upload button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.blue,
-                            padding: const EdgeInsets.symmetric(vertical: 13),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          ),
-                          icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                          label: const Text('Upload Photos', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(color: AppColors.blue),
+                      )
+                    : _photos.isEmpty
+                        ? _EmptyPhotosState(onUpload: _uploadPhotos)
+                        : _buildLibraryBody(),
               ),
             ],
           ),
-
-          // Lightbox overlay
-          if (_lightboxOpen)
-            GestureDetector(
-              onTap: _closeLightbox,
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.9),
-                width: double.infinity,
-                height: double.infinity,
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              _lightboxUrl,
-                              fit: BoxFit.contain,
-                              width: MediaQuery.of(context).size.width * 0.9,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            _lightboxCaption,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white70),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text('Tap anywhere to close', style: TextStyle(fontSize: 11, color: Color(0x66FFFFFF))),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 60,
-                      right: 20,
-                      child: GestureDetector(
-                        onTap: _closeLightbox,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.close, color: Colors.white, size: 18),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          if (_lightboxOpen && _lightboxBytes != null) _buildLightbox(),
         ],
       ),
     );
   }
 
-  final List<_Photo> _birthdayPhotos = [
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop', caption: "Emma's 7th birthday"),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=600&h=600&fit=crop', caption: 'Liam turns 6!'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&h=600&fit=crop', caption: 'Birthday cake'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1543258103-a62bdc069871?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1543258103-a62bdc069871?w=600&h=600&fit=crop', caption: "Sarah's surprise party"),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1587668178277-295251f900ce?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1587668178277-295251f900ce?w=600&h=600&fit=crop', caption: 'Family birthday dinner'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=600&h=600&fit=crop', caption: 'Happy birthday balloons'),
-  ];
-
-  final List<_Photo> _vacationPhotos = [
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=600&fit=crop', caption: 'Beach vacation'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop', caption: 'Mountain hiking'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&h=600&fit=crop', caption: 'Lake day'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=600&fit=crop', caption: 'Forest trail'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&h=600&fit=crop', caption: 'Sunset view'),
-    _Photo(thumbUrl: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=200&h=200&fit=crop', fullUrl: 'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=600&h=600&fit=crop', caption: 'City trip'),
-  ];
-
-  void _pushAlbumDetail(BuildContext ctx, String title, String count, List<_Photo> photos) {
-    Navigator.push(ctx, MaterialPageRoute(builder: (_) => _AlbumDetailScreen(title: title, count: count, photos: photos)));
+  Widget _buildLibraryBody() {
+    final heroPhoto = _recentPhotos.first;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _OnThisDayCard(
+            photo: heroPhoto,
+            bytes: _photoBytes[heroPhoto.id],
+            onTap: () => _openLightbox(heroPhoto),
+          ),
+          if (_albums.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const _SectionTitle('Albums'),
+            const SizedBox(height: 8),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.45,
+              ),
+              itemCount: _albums.length,
+              itemBuilder: (context, index) {
+                final album = _albums[index];
+                final cover = _coverPhoto(album);
+                return _AlbumCard(
+                  album: album,
+                  coverBytes: cover == null ? null : _photoBytes[cover.id],
+                  onTap: () => _pushAlbumDetail(album),
+                );
+              },
+            ),
+          ],
+          const SizedBox(height: 16),
+          const _SectionTitle('Recent'),
+          const SizedBox(height: 8),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 5,
+              crossAxisSpacing: 5,
+            ),
+            itemCount: _recentPhotos.length,
+            itemBuilder: (context, index) {
+              final photo = _recentPhotos[index];
+              return _PhotoTile(
+                bytes: _photoBytes[photo.id],
+                onTap: () => _openLightbox(photo),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _PrimaryButton(
+            label: _isSaving ? 'Encrypting...' : 'Upload Photos',
+            icon: Icons.add,
+            onTap: _isSaving ? null : _uploadPhotos,
+          ),
+          const SizedBox(height: 10),
+          _PrimaryButton(
+            label: 'Create Album',
+            icon: Icons.photo_album_outlined,
+            onTap: _isSaving ? null : _createAlbum,
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildAlbumCard(String title, String count, String imgUrl, VoidCallback onTap) {
+  MemoryPhotoModel? _coverPhoto(AlbumModel album) {
+    for (final id in album.photoIds) {
+      for (final photo in _photos) {
+        if (photo.id == id) {
+          return photo;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  Widget _buildLightbox() {
+    return GestureDetector(
+      onTap: _closeLightbox,
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.9),
+        width: double.infinity,
+        height: double.infinity,
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      _lightboxBytes!,
+                      fit: BoxFit.contain,
+                      width: MediaQuery.of(context).size.width * 0.9,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    _lightboxCaption,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tap anywhere to close',
+                    style: TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 60,
+              right: 20,
+              child: GestureDetector(
+                onTap: _closeLightbox,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  final bool isSaving;
+
+  const _Header({required this.isSaving});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.blue,
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Album',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                child: Text(
+                  isSaving ? 'Encrypting' : 'Encrypted',
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyPhotosState extends StatelessWidget {
+  final VoidCallback onUpload;
+
+  const _EmptyPhotosState({required this.onUpload});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.photo_library_outlined, size: 42, color: AppColors.g400),
+            const SizedBox(height: 12),
+            const Text(
+              'There are no photos',
+              style: TextStyle(
+                color: AppColors.g900,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Upload photos to create encrypted albums.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: AppColors.g500,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: _PrimaryButton(
+                label: 'Upload Photos',
+                icon: Icons.add,
+                onTap: onUpload,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OnThisDayCard extends StatelessWidget {
+  final MemoryPhotoModel photo;
+  final Uint8List? bytes;
+  final VoidCallback onTap;
+
+  const _OnThisDayCard({
+    required this.photo,
+    required this.bytes,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.g200),
-        ),
-        clipBehavior: Clip.hardEdge,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        height: 174,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
           children: [
-            Image.network(imgUrl, width: double.infinity, height: 72, fit: BoxFit.cover),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            Positioned.fill(child: _MemoryImage(bytes: bytes)),
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.72),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              bottom: 18,
+              left: 18,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.g800)),
-                  const SizedBox(height: 1),
-                  Text(count, style: const TextStyle(fontSize: 10, color: AppColors.g400)),
+                  Text(
+                    'ON THIS DAY',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    '3 years ago today',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -328,28 +551,200 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
   }
 }
 
-// Album Detail Screen (Birthdays / Vacations)
-class _AlbumDetailScreen extends StatefulWidget {
-  final String title;
-  final String count;
-  final List<_Photo> photos;
+class _AlbumCard extends StatelessWidget {
+  final AlbumModel album;
+  final Uint8List? coverBytes;
+  final VoidCallback onTap;
 
-  const _AlbumDetailScreen({required this.title, required this.count, required this.photos});
+  const _AlbumCard({
+    required this.album,
+    required this.coverBytes,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.g200),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SizedBox(
+                width: double.infinity,
+                child: _MemoryImage(bytes: coverBytes),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    album.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.g900,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${album.photoIds.length} photos',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.g400,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PhotoTile extends StatelessWidget {
+  final Uint8List? bytes;
+  final VoidCallback onTap;
+
+  const _PhotoTile({
+    required this.bytes,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(9),
+        child: _MemoryImage(bytes: bytes),
+      ),
+    );
+  }
+}
+
+class _MemoryImage extends StatelessWidget {
+  final Uint8List? bytes;
+
+  const _MemoryImage({required this.bytes});
+
+  @override
+  Widget build(BuildContext context) {
+    if (bytes == null) {
+      return Container(
+        color: AppColors.g100,
+        child: const Icon(Icons.lock_outline, color: AppColors.g400, size: 20),
+      );
+    }
+
+    return Image.memory(
+      bytes!,
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      gaplessPlayback: true,
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _PrimaryButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue,
+          disabledBackgroundColor: AppColors.blue.withValues(alpha: 0.55),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        icon: Icon(icon, color: Colors.white, size: 21),
+        label: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+        color: AppColors.g400,
+        letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+class _AlbumDetailScreen extends StatefulWidget {
+  final AlbumModel album;
+  final List<MemoryPhotoModel> photos;
+  final Map<String, Uint8List> photoBytes;
+
+  const _AlbumDetailScreen({
+    required this.album,
+    required this.photos,
+    required this.photoBytes,
+  });
 
   @override
   State<_AlbumDetailScreen> createState() => _AlbumDetailScreenState();
 }
 
 class _AlbumDetailScreenState extends State<_AlbumDetailScreen> {
-  bool _lightboxOpen = false;
-  String _lightboxUrl = '';
+  Uint8List? _lightboxBytes;
   String _lightboxCaption = '';
 
-  void _openLightbox(String url, String caption) {
+  void _openPhoto(MemoryPhotoModel photo) {
+    final bytes = widget.photoBytes[photo.id];
+    if (bytes == null) {
+      return;
+    }
+
     setState(() {
-      _lightboxUrl = url;
-      _lightboxCaption = caption;
-      _lightboxOpen = true;
+      _lightboxBytes = bytes;
+      _lightboxCaption = photo.originalName;
     });
   }
 
@@ -365,98 +760,83 @@ class _AlbumDetailScreenState extends State<_AlbumDetailScreen> {
                 color: AppColors.blue,
                 child: SafeArea(
                   bottom: false,
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Row(
-                          children: [
-                            Text('9:41', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                          ],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 16, 14),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                        Expanded(
+                          child: Text(
+                            widget.album.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
                             ),
-                            const SizedBox(width: 12),
-                            Text(widget.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
-                            const Spacer(),
-                            Text(widget.count, style: const TextStyle(fontSize: 11, color: Colors.white60)),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          '${widget.photos.length} photos',
+                          style: const TextStyle(fontSize: 12, color: Colors.white70),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(12),
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 3,
-                      crossAxisSpacing: 3,
-                    ),
-                    itemCount: widget.photos.length,
-                    itemBuilder: (ctx, i) {
-                      final p = widget.photos[i];
-                      return GestureDetector(
-                        onTap: () => _openLightbox(p.fullUrl, p.caption),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(p.thumbUrl, fit: BoxFit.cover),
+                child: widget.photos.isEmpty
+                    ? const Center(child: Text('There are no photos'))
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(12),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 5,
+                          crossAxisSpacing: 5,
                         ),
-                      );
-                    },
-                  ),
-                ),
+                        itemCount: widget.photos.length,
+                        itemBuilder: (context, index) {
+                          final photo = widget.photos[index];
+                          return _PhotoTile(
+                            bytes: widget.photoBytes[photo.id],
+                            onTap: () => _openPhoto(photo),
+                          );
+                        },
+                      ),
               ),
             ],
           ),
-
-          // Lightbox
-          if (_lightboxOpen)
+          if (_lightboxBytes != null)
             GestureDetector(
-              onTap: () => setState(() => _lightboxOpen = false),
+              onTap: () => setState(() => _lightboxBytes = null),
               child: Container(
                 color: Colors.black.withValues(alpha: 0.9),
                 width: double.infinity,
                 height: double.infinity,
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(_lightboxUrl, fit: BoxFit.contain, width: MediaQuery.of(context).size.width * 0.9),
-                          ),
-                          const SizedBox(height: 14),
-                          Text(_lightboxCaption, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white70), textAlign: TextAlign.center),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      top: 60, right: 20,
-                      child: GestureDetector(
-                        onTap: () => setState(() => _lightboxOpen = false),
-                        child: Container(
-                          width: 36, height: 36,
-                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), shape: BoxShape.circle),
-                          child: const Icon(Icons.close, color: Colors.white, size: 18),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.memory(
+                          _lightboxBytes!,
+                          fit: BoxFit.contain,
+                          width: MediaQuery.of(context).size.width * 0.9,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 14),
+                      Text(
+                        _lightboxCaption,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

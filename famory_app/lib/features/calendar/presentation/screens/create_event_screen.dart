@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/calendar_event.dart';
 import '../../data/services/event_service.dart';
 
 /// Bottom sheet shown when the user taps "+ Event" on the Calendar screen.

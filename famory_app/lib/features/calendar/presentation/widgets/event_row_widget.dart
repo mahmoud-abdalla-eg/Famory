@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../data/models/calendar_event.dart';
 import '../../data/services/event_service.dart';
 import '../screens/create_event_screen.dart';
 
