@@ -6,6 +6,7 @@ import '../../features/splash/presentation/screens/splash_screen.dart';
 // import '../../features/onboarding/presentation/screens/welcome_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart'; // Using the existing one
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/session_expired_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/home/presentation/screens/app_container.dart';
 import '../../features/family/presentation/screens/create_family_basic_screen.dart';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
+  static const String sessionExpired = '/session-expired';
   static const String signup = '/signup';
   static const String home = '/home';
   static const String familyJoin = '/family-join';
@@ -46,6 +48,10 @@ class AppRoutes {
     GetPage(
       name: login,
       page: () => const LoginScreen(),
+    ),
+    GetPage(
+      name: sessionExpired,
+      page: () => const SessionExpiredScreen(),
     ),
     GetPage(
       name: signup,

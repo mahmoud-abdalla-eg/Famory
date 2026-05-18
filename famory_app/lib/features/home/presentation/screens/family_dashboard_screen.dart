@@ -96,8 +96,8 @@ class FamilyDashboardScreen extends StatelessWidget {
                           icon: Icons.add_photo_alternate_outlined,
                           title: 'Add Memory',
                           subtitle: 'Family Album',
-                          iconColor: AppColors.purple,
-                          iconBg: AppColors.purpleL,
+                          iconColor: AppColors.teal,
+                          iconBg: AppColors.tealL,
                           onTap: () => onNavigate('photos'),
                         ),
                         _QuickActionCard(
@@ -230,7 +230,7 @@ class _Header extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: const BoxDecoration(
-        color: AppColors.dashboardPurple,
+        color: AppColors.blue,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
@@ -493,11 +493,11 @@ class _InviteMember extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(
+      child: const Column(
         children: [
           CustomPaint(
             painter: _DashedCirclePainter(color: AppColors.g300),
-            child: const SizedBox(
+            child: SizedBox(
               width: 52,
               height: 52,
               child: Center(
@@ -505,8 +505,8 @@ class _InviteMember extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 7),
-          const Text('Invite', style: TextStyle(fontSize: 12, color: AppColors.g500, fontWeight: FontWeight.w900)),
+          SizedBox(height: 7),
+          Text('Invite', style: TextStyle(fontSize: 12, color: AppColors.g500, fontWeight: FontWeight.w900)),
         ],
       ),
     );

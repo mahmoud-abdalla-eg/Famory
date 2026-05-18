@@ -209,14 +209,14 @@ const login = async (req, res) => {
     const token = jwt.sign(
       { email: selecteduser.email, id: selecteduser._id },
       JWT_SECRET,
-      { expiresIn: '1h' } // Token expires in 1 hour
+      { expiresIn: '30d' } // Token expires in 30 days
     );
 
     return res.status(200).json({
       status: 'Ok',
       msg: 'Success :)',
       token,
-      expiresIn: 3600, // 1 hour in seconds
+      expiresIn: 60 * 60 * 24 * 30, // 30 days in seconds
     });
   } catch (error) {
     console.error('Login error:', error.message || error);
@@ -240,3 +240,4 @@ module.exports = {
   selectById,
   // confirmEmail
 };
+

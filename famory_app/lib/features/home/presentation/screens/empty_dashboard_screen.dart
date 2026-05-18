@@ -118,7 +118,7 @@ class _Header extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: BoxDecoration(
-        color: AppColors.dashboardPurple,
+        color: AppColors.blue,
         borderRadius: BorderRadius.circular(26),
       ),
       child: Column(
